@@ -221,6 +221,13 @@ let freetype = Package(
   sourceUrl: "https://download.savannah.gnu.org/releases/freetype/freetype-2.13.3.tar.xz",
   sha256: "0550350666d427c74daeb85d5ac7bb353acba5f76956395995311a9c6f063289",
 )
+let fribidi = Package(
+  name: "fribidi",
+  sourceUrl: "https://github.com/fribidi/fribidi/releases/download/v1.0.14/fribidi-1.0.14.tar.xz",
+  sha256: "76ae204a7027652ac3981b9fa5817c083ba23114340284c58e756b259cd2259a",
+  buildSystem: "meson",
+  buildArguments: @["-Ddocs=false", "-Dtests=false"],
+)
 let libassPkg = Package(
   name: "libass",
   sourceUrl: "https://github.com/libass/libass/releases/download/0.17.3/libass-0.17.3.tar.xz",
@@ -253,6 +260,7 @@ proc selectPackages(kind: CrossKind = native): seq[Package] =
   result &= [lame, opus, dav1d, x264]
   if kind == native:
     result.add freetype
+    result.add fribidi
     result.add libassPkg
   if not disableVpx:
     result.add vpx
@@ -816,7 +824,7 @@ proc setupDeps =
     exec "pip install " & toInstall.join(" ")
 
 task downloaddeps, "Download and Extract Cxx Dependencies":
-  let allPackages = @[ffmpeg, nvheaders, libvpl, whisper, lame, opus, dav1d, x264, freetype, libassPkg, vpx, svtav1, x265]
+  let allPackages = @[ffmpeg, nvheaders, libvpl, whisper, lame, opus, dav1d, x264, freetype, fribidi, libassPkg, vpx, svtav1, x265]
   mkDir "ffmpeg_sources"
   withDir "ffmpeg_sources":
     for package in allPackages:
