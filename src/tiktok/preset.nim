@@ -14,12 +14,14 @@ type ProfileSpec* = object
   name*: string
   hookWindow*: bool
   captionSafeZone*: bool
+  burnCaptions*: bool
 
 const tiktokResolution* = (int32(1080), int32(1920))
 const hookWindowEnd* = "3sec"
 
 proc parseProfileSpec*(raw: string): ProfileSpec =
-  result = ProfileSpec(name: raw, hookWindow: true, captionSafeZone: true)
+  result = ProfileSpec(name: raw, hookWindow: true, captionSafeZone: true,
+    burnCaptions: true)
   let colon = raw.find(':')
   if colon == -1:
     return
@@ -30,6 +32,8 @@ proc parseProfileSpec*(raw: string): ProfileSpec =
       result.hookWindow = false
     of "no-safe-zone":
       result.captionSafeZone = false
+    of "no-burn-captions":
+      result.burnCaptions = false
     else:
       error("Unknown profile modifier: " & piece)
 
@@ -67,6 +71,8 @@ proc applyProfile*(args: var mainArgs, overrides: ProfileOverrides) =
     applyTiktokPreset(args, overrides, hook)
     if spec.captionSafeZone and not args.noCaptionSafeZone:
       args.captionSafeZone = true
+    if spec.burnCaptions and not args.noBurnCaptions:
+      args.burnCaptions = true
   of "":
     discard
   else:

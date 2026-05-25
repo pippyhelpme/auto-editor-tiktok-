@@ -38,6 +38,7 @@ Use these terms for TikTok-facing work. Do **not** invent synonyms once defined 
 | **Short-form clip** | Vertical video intended for TikTok (and similar platforms). Default target length: under 3 minutes; sweet spot 15–60 seconds. Use `--profile tiktok`. |
 | **Vertical frame** | 9:16 aspect ratio. Target resolution: **1080×1920** unless an ADR says otherwise. |
 | **Platform export** | Final encode profile tuned for TikTok upload (codec, bitrate, audio loudness). Use `--profile tiktok` for the current preset. |
+| **Burn-in captions** | Hard-coded captions via FFmpeg `subtitles` filter. Use `--burn-captions` / `--captions FILE`; enabled by `--profile tiktok` when a caption source exists. Soft subs are omitted (`-sn`) when burning. |
 | **Hook window** | First **3 seconds** of a clip; `--profile tiktok` keeps this range uncut via `--set-action nil,0,3sec`. Disable with `--no-hook-window` or `--profile tiktok:no-hook`. |
 | **Caption-safe zone** | Bottom **25%** of a vertical frame reserved for TikTok caption UI. `--profile tiktok` top-aligns content in the upper **75%**. Disable with `--no-caption-safe-zone` or `--profile tiktok:no-safe-zone`. |
 

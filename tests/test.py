@@ -452,6 +452,15 @@ class Runner:
         cn = fileinfo(out)
         assert cn.videos[0].res == (1080, 1920)
 
+    def test_burn_captions_movtext(self) -> None:
+        out = self.main(
+            ["resources/mov_text.mp4"],
+            ["--burn-captions"],
+            "movtext_burned.mp4",
+        )
+        cn = fileinfo(out)
+        assert len(cn.subtitles) == 0
+
     def test_input_extension(self):
         """Input file must have an extension. Throw error if none is given."""
         path = os.path.join(self.temp_dir, "example")

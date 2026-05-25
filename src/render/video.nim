@@ -2,6 +2,7 @@ import std/[options, sets, strformat, tables]
 from std/math import round
 
 import ../[action, av, ffmpeg, graph, log, timeline]
+import ../tiktok/captions
 import ../util/[color, rational]
 
 # Helps with timing, may be extended.
@@ -264,7 +265,14 @@ proc makeNewVideoFrames*(output: var OutputContainer, tl: v3, args: mainArgs,
   var targetHeight = tl.res[1]
   var scaleGraph: Graph = nil
   var fxGraph: Graph = nil
+  var captionsGraph: Graph = nil
   var fxKey = ""
+  var captionsKey = ""
+  var captionFile = ""
+  if args.burnCaptions and firstSrc != nil:
+    captionFile = resolveCaptionFile(args, firstSrc[])
+    if captionFile == "":
+      warning "burn-captions enabled but no captions found; skipping burn-in"
   var needsScaling = false
 
   if args.scale != 1.0:
@@ -619,6 +627,23 @@ proc makeNewVideoFrames*(output: var OutputContainer, tl: v3, args: mainArgs,
             av_frame_free(addr frame)
             frame = fxGraph.pull()
 
+      if captionFile != "" and frame != nil and frame.width > 0 and frame.height > 0:
+        let frameFmtName = $AVPixelFormat(frame.format)
+        let bufferArgs = &"video_size={frame.width}x{frame.height}:pix_fmt={frameFmtName}:time_base={graphTb}:pixel_aspect=1/1"
+        let key = captionFile & "|" & bufferArgs
+        if key != captionsKey:
+          if captionsGraph != nil:
+            captionsGraph.cleanup()
+          captionsGraph = newGraph()
+          let bufferSrc = captionsGraph.add("buffer", bufferArgs)
+          let subs = captionsGraph.add("subtitles", buildSubtitlesFilterArgs(captionFile))
+          let bufferSink = captionsGraph.add("buffersink")
+          captionsGraph.linkNodes(@[bufferSrc, subs, bufferSink]).configure()
+          captionsKey = key
+        captionsGraph.push(frame)
+        av_frame_free(addr frame)
+        frame = captionsGraph.pull()
+
       # Validate frame before reformatting
       if frame != nil and (frame.width <= 0 or frame.height <= 0):
         debug &"Warning: Invalid frame at {index}tb, using fallback"
@@ -653,6 +678,8 @@ proc makeNewVideoFrames*(output: var OutputContainer, tl: v3, args: mainArgs,
       scaleGraph.cleanup()
     if fxGraph != nil:
       fxGraph.cleanup()
+    if captionsGraph != nil:
+      captionsGraph.cleanup()
     sws_free_context(addr reformatCtx)
     av_frame_free(addr lastProcessedFrame)
     av_frame_free(addr nullFrame)

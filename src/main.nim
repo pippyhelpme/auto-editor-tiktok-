@@ -344,6 +344,9 @@ judge making cuts.
       profileOverrides.incl pfOutput
     of "profile":
       args.profile = key
+    of "burn-captions-path":
+      args.burnCaptionsPath = key
+      args.burnCaptions = true
     of "when-silent":
       args.whenSilent = parseActions(key)
     of "when-normal":
@@ -429,6 +432,9 @@ judge making cuts.
     error &"{cmdLineParams[^1]} needs argument."
 
   applyProfile(args, profileOverrides)
+
+  if args.burnCaptions:
+    args.sn = true
 
   if showVersion:
     echo version

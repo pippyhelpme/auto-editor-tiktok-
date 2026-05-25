@@ -55,6 +55,7 @@ type mainArgs* = object
   whenSilent*: Actions = aCut
   `export`*: string = ""
   output*: string = ""
+  burnCaptionsPath*: string = ""
   setAction*: seq[(Actions, PackedInt, PackedInt)]
 
   # URL download Options

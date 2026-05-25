@@ -34,6 +34,8 @@ The preset keeps the first **3 seconds** (the hook window) uncut by default. Dis
 
 Video is reframed to the **upper 75%** of the vertical frame so TikTok's caption UI does not cover important content. Disable with `--no-caption-safe-zone` or `--profile tiktok:no-safe-zone`.
 
+Embedded or file-based captions can be **burned in** with `--burn-captions` (or `--captions FILE`). The TikTok profile enables burn-in when captions are available. Disable with `--no-burn-captions` or `--profile tiktok:no-burn-captions`.
+
 <h2 align="center">Installing</h2>
 
 See [Installing](https://auto-editor.com/installing) for more information.

@@ -2,7 +2,7 @@ import unittest
 import std/[options, os, strutils, tempfiles]
 
 import ../src/[av, conductor, ffmpeg, log, media, timeline, wavutil]
-import ../src/tiktok/preset
+import ../src/tiktok/[preset, captions]
 import ../src/action
 import ../src/util/[color, fun, lang, rational]
 import ../src/exports/[kdenlive, fcp11]
@@ -196,6 +196,13 @@ test "tiktok caption safe zone flag":
   args.profile = "tiktok"
   applyProfile(args, {})
   check args.captionSafeZone
+
+test "caption filter args":
+  check "force_style" in buildSubtitlesFilterArgs("/tmp/test.ass")
+  check "MarginV=96" in tiktokCaptionStyle()
+
+test "parse profile burn captions modifier":
+  check parseProfileSpec("tiktok:no-burn-captions").burnCaptions == false
 
 test "agSplitFile":
   check agSplitFile("/").ext == ""
