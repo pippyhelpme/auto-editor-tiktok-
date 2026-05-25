@@ -90,7 +90,10 @@ const whisperOptions*: seq[OptDef] = @[
 const mainOptions*: seq[OptDef] = @[
   OptDef(names: "--profile", c: cEdit, datum: "profile", metavar: "NAME",
     help: """
-Apply a platform editing preset (e.g. tiktok, tiktok:no-hook). Explicit flags override preset defaults."""),
+Apply a platform editing preset (e.g. tiktok, tiktok:no-hook, tiktok:clips=5). Explicit flags override preset defaults."""),
+  OptDef(names: "--clips", c: cEdit, datum: "clips", metavar: "N",
+    help: """
+Export up to N short clips (15–60s kept segments) instead of one combined file. Use with --profile tiktok for vertical naming ({stem}_clip01_tiktok.mp4)."""),
   OptDef(names: "--no-hook-window", c: cEdit, kind: Flag, datum: "args.noHookWindow",
     help: "Disable keeping the first 3 seconds when using a platform profile"),
   OptDef(names: "--caption-safe-zone", c: cVid, kind: Flag, datum: "args.captionSafeZone",

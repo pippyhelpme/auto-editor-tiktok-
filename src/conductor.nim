@@ -10,6 +10,7 @@ import imports/[fcp7, json]
 import exports/[fcp7, fcp11, json, shotcut, kdenlive, otio]
 import render/format
 import stats
+import tiktok/clips
 
 
 proc parseExportString*(exportStr: string): (string, string, string) =
@@ -325,18 +326,23 @@ proc editMedia*(args: var mainArgs) =
 
   debug &"Temp Directory: {tempDir}"
 
-  if args.`export` == "clip-sequence":
+  if args.clipCount > 0 or args.`export` == "clip-sequence":
     if tlV3.isNonlinear:
-      error "Timeline too complex to use clip-sequence export"
+      error "Timeline too complex to use clip export"
 
     func appendFilename(path, val: string): string =
       let (dir, name, ext) = agSplitFile(path)
       return (dir / name) & val & ext
 
     var clips2: seq[Clip2] = @[]
-    for clip in tlV3.clips2:
-      if not tlV3.effects[clip.effect].isCut:
-        clips2.add(clip)
+    if args.clipCount > 0:
+      clips2 = selectClips(tlV3, args.clipCount)
+      if clips2.len == 0:
+        error &"No clips matched duration limits ({defaultMinClipSec:g}–{defaultMaxClipSec:g}s). Try fewer silence cuts or adjust --margin."
+    else:
+      for clip in tlV3.clips2:
+        if not tlV3.effects[clip.effect].isCut:
+          clips2.add(clip)
 
     let unique = tlV3.uniqueSources()
     var src: ptr string
@@ -354,7 +360,11 @@ proc editMedia*(args: var mainArgs) =
     for clipNum, clip2 in clips2.pairs:
       var myTimeline = toNonLinear2(src, tlV3.tb, black, mi, @[clip2], tlV3.effects)
       applyArgs(myTimeline, args)
-      makeMedia(args, myTimeline, appendFilename(output, &"-{clipNum}"), rule, bar, cache)
+      let outPath = if args.clipCount > 0:
+        clipOutputPath(usePath, args.output, clipNum, clips2.len)
+      else:
+        appendFilename(output, &"-{clipNum}")
+      makeMedia(args, myTimeline, outPath, rule, bar, cache)
   else:
     makeMedia(args, tlV3, output, rule, bar)
 

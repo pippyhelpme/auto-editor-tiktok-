@@ -36,6 +36,14 @@ Video is reframed to the **upper 75%** of the vertical frame so TikTok's caption
 
 Embedded or file-based captions can be **burned in** with `--burn-captions` (or `--captions FILE`). The TikTok profile enables burn-in when captions are available. Disable with `--no-burn-captions` or `--profile tiktok:no-burn-captions`.
 
+Export multiple short clips from one long video:
+
+```
+auto-editor long.mp4 --profile tiktok --clips 5
+```
+
+Keeps the longest **15–60 second** segments after the first pass and writes `{stem}_clip01_tiktok.mp4`, `{stem}_clip02_tiktok.mp4`, etc. Same as `--profile tiktok:clips=5`.
+
 <h2 align="center">Installing (this fork)</h2>
 
 ### Pre-built binaries (recommended)

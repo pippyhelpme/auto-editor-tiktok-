@@ -1,4 +1,4 @@
-import std/[options, os, strutils]
+import std/[options, os, parseutils, strutils]
 
 import ../action
 import ../log
@@ -15,19 +15,30 @@ type ProfileSpec* = object
   hookWindow*: bool
   captionSafeZone*: bool
   burnCaptions*: bool
+  clipCount*: int
 
 const tiktokResolution* = (int32(1080), int32(1920))
 const hookWindowEnd* = "3sec"
 
 proc parseProfileSpec*(raw: string): ProfileSpec =
   result = ProfileSpec(name: raw, hookWindow: true, captionSafeZone: true,
-    burnCaptions: true)
+    burnCaptions: true, clipCount: 0)
   let colon = raw.find(':')
   if colon == -1:
     return
   result.name = raw[0 ..< colon]
   for piece in raw[colon + 1 .. ^1].split(','):
-    case piece.strip
+    let modifier = piece.strip
+    if modifier.startsWith("clips="):
+      var count: int
+      let val = modifier[6 .. ^1].strip
+      if val.len == 0:
+        error("Invalid profile clips count: " & val)
+      if parseSaturatedNatural(val, count) == 0 or count < 1:
+        error("Invalid profile clips count: " & val)
+      result.clipCount = count
+      continue
+    case modifier
     of "no-hook":
       result.hookWindow = false
     of "no-safe-zone":
@@ -35,7 +46,7 @@ proc parseProfileSpec*(raw: string): ProfileSpec =
     of "no-burn-captions":
       result.burnCaptions = false
     else:
-      error("Unknown profile modifier: " & piece)
+      error("Unknown profile modifier: " & modifier)
 
 proc applyHookWindow*(args: var mainArgs) =
   let hookKeep = (aNil, parseTime("0"), parseTime(hookWindowEnd))
@@ -57,7 +68,7 @@ proc applyTiktokPreset*(args: var mainArgs, overrides: ProfileOverrides,
     args.crf = 23
   if pfVprofile notin overrides:
     args.vprofile = "high"
-  if pfOutput notin overrides and args.inputs.len > 0:
+  if pfOutput notin overrides and args.inputs.len > 0 and args.clipCount == 0:
     let (dir, name, _) = agSplitFile(args.inputs[0])
     args.output = joinPath(dir, name & "_tiktok.mp4")
   if hookWindow:
@@ -73,6 +84,8 @@ proc applyProfile*(args: var mainArgs, overrides: ProfileOverrides) =
       args.captionSafeZone = true
     if spec.burnCaptions and not args.noBurnCaptions:
       args.burnCaptions = true
+    if spec.clipCount > 0 and args.clipCount == 0:
+      args.clipCount = spec.clipCount
   of "":
     discard
   else:

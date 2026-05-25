@@ -452,6 +452,24 @@ class Runner:
         cn = fileinfo(out)
         assert cn.videos[0].res == (1080, 1920)
 
+    def test_profile_clips(self) -> None:
+        out = self.main(
+            ["example.mp4"],
+            [
+                "--profile",
+                "tiktok",
+                "--clips",
+                "1",
+                "--when-silent",
+                "nil",
+                "--when-normal",
+                "nil",
+            ],
+            "example_clip01_tiktok.mp4",
+        )
+        cn = fileinfo(out)
+        assert cn.videos[0].res == (1080, 1920)
+
     def test_burn_captions_movtext(self) -> None:
         out = self.main(
             ["resources/mov_text.mp4"],

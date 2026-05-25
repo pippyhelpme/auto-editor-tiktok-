@@ -48,6 +48,7 @@ type mainArgs* = object
 
   # Editing Options
   profile*: string = ""
+  clipCount*: int = 0
   margin*: (PackedInt, PackedInt) = (pack(true, 200), pack(true, 200)) # 0.2s
   smooth*: (PackedInt, PackedInt) = (pack(true, 200), pack(true, 100)) # 0.2s,0.1s
   edit*: string = "audio"

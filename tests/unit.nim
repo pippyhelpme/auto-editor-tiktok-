@@ -2,7 +2,7 @@ import unittest
 import std/[options, os, strutils, tempfiles]
 
 import ../src/[av, conductor, ffmpeg, log, media, timeline, wavutil]
-import ../src/tiktok/[preset, captions]
+import ../src/tiktok/[preset, captions, clips]
 import ../src/action
 import ../src/util/[color, fun, lang, rational]
 import ../src/exports/[kdenlive, fcp11]
@@ -203,6 +203,31 @@ test "caption filter args":
 
 test "parse profile burn captions modifier":
   check parseProfileSpec("tiktok:no-burn-captions").burnCaptions == false
+
+test "parse profile clips modifier":
+  check parseProfileSpec("tiktok:clips=3").clipCount == 3
+  check parseProfileSpec("tiktok:clips=5,no-hook").clipCount == 5
+  check parseProfileSpec("tiktok:clips=5,no-hook").hookWindow == false
+
+test "select clips ranking":
+  var tl = v3(
+    tb: AVRational(num: 30, den: 1),
+    effects: @[aNil, aCut],
+    clips2: @[
+      Clip2(start: 0, `end`: 450, effect: 0),      # 15s kept
+      Clip2(start: 450, `end`: 900, effect: 1),    # cut
+      Clip2(start: 900, `end`: 2700, effect: 0),   # 60s kept
+      Clip2(start: 2700, `end`: 3000, effect: 0),  # 10s kept (too short)
+    ],
+  )
+  let picked = selectClips(tl, 2)
+  check picked.len == 2
+  check picked[0].start == 900
+  check picked[1].start == 0
+
+test "clip output path":
+  check clipOutputPath("/tmp/podcast.mp4", "", 0, 3) == "/tmp/podcast_clip01_tiktok.mp4"
+  check clipOutputPath("/tmp/podcast.mp4", "", 2, 3) == "/tmp/podcast_clip03_tiktok.mp4"
 
 test "agSplitFile":
   check agSplitFile("/").ext == ""

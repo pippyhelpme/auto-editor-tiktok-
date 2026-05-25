@@ -20,7 +20,7 @@ A **fork of [auto-editor](https://github.com/WyattBlue/auto-editor)** (Nim CLI) 
 
 Release binaries for primary platforms (linux-x86_64, linux-aarch64, macOS) were blocked by CI tarball hash mismatches; fixed on master (re-run release build to publish assets). Windows pre-built binaries omit burn-in (no libass in cross-build).
 
-**Next planned:** creator workflow — turn one long video into multiple short clips (see open issues).
+**Next planned:** smarter clip ranking (motion/audio peaks), batch folder output, creator onboarding docs.
 
 ## Glossary — inherited from auto-editor
 
@@ -51,7 +51,7 @@ Use these terms for TikTok-facing work. Do **not** invent synonyms once defined 
 | **Burn-in captions** | Hard-coded captions via FFmpeg `subtitles` filter. Use `--burn-captions` / `--captions FILE`; enabled by `--profile tiktok` when a caption source exists. Soft subs are omitted (`-sn`) when burning. |
 | **Hook window** | First **3 seconds** of a clip; `--profile tiktok` keeps this range uncut via `--set-action nil,0,3sec`. Disable with `--no-hook-window` or `--profile tiktok:no-hook`. |
 | **Caption-safe zone** | Bottom **25%** of a vertical frame reserved for TikTok caption UI. `--profile tiktok` top-aligns content in the upper **75%**. Disable with `--no-caption-safe-zone` or `--profile tiktok:no-safe-zone`. |
-| **Multi-clip export** *(planned)* | Split one long source into **N** ranked short clips, each with `--profile tiktok` defaults. Distinct from the first pass (silence removal on a single timeline). |
+| **Multi-clip export** | Split one long source into **N** ranked short clips (15–60s kept segments), each with `--profile tiktok` defaults. Use `--clips N` or `--profile tiktok:clips=N`. Outputs `{stem}_clip01_tiktok.mp4`, etc. Implemented in `src/tiktok/clips.nim`. |
 
 ## Code layout
 

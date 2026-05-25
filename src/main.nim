@@ -344,6 +344,11 @@ judge making cuts.
       profileOverrides.incl pfOutput
     of "profile":
       args.profile = key
+    of "clips":
+      var count: int
+      if parseSaturatedNatural(key, count) == 0 or count < 1:
+        error("--clips requires a positive integer.")
+      args.clipCount = count
     of "burn-captions-path":
       args.burnCaptionsPath = key
       args.burnCaptions = true
