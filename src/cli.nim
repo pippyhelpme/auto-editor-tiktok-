@@ -89,7 +89,10 @@ const whisperOptions*: seq[OptDef] = @[
 
 const mainOptions*: seq[OptDef] = @[
   OptDef(names: "--profile", c: cEdit, datum: "profile", metavar: "NAME",
-    help: "Apply a platform editing preset (e.g. tiktok). Explicit flags override preset defaults."),
+    help: """
+Apply a platform editing preset (e.g. tiktok, tiktok:no-hook). Explicit flags override preset defaults."""),
+  OptDef(names: "--no-hook-window", c: cEdit, kind: Flag, datum: "args.noHookWindow",
+    help: "Disable keeping the first 3 seconds when using a platform profile"),
   OptDef(names: "-e, --edit", c: cEdit, datum: "edit", metavar: "METHOD",
       help: """
 Set an expression which determines how to make auto edits. (default is "audio")"""),

@@ -3,6 +3,7 @@ import std/[options, os, strutils, tempfiles]
 
 import ../src/[av, conductor, ffmpeg, log, media, timeline, wavutil]
 import ../src/tiktok/preset
+import ../src/action
 import ../src/util/[color, fun, lang, rational]
 import ../src/exports/[kdenlive, fcp11]
 import ../src/vendor/tinyre/tinyre
@@ -167,6 +168,24 @@ test "tiktok preset respects overrides":
   check args.margin[0].getNumber == 500
   check args.margin[1].getNumber == 500
   check args.resolution == tiktokResolution
+
+test "tiktok hook window":
+  var args = mainArgs()
+  applyTiktokPreset(args, {}, hookWindow = true)
+  check args.setAction.len == 1
+  check args.setAction[0][0] == aNil
+  check args.setAction[0][1].getNumber == 0
+  check args.setAction[0][2].getNumber == 3000
+
+test "tiktok hook window disabled":
+  var args = mainArgs()
+  applyTiktokPreset(args, {}, hookWindow = false)
+  check args.setAction.len == 0
+
+test "parse profile spec":
+  check parseProfileSpec("tiktok").name == "tiktok"
+  check parseProfileSpec("tiktok").hookWindow
+  check parseProfileSpec("tiktok:no-hook").hookWindow == false
 
 test "agSplitFile":
   check agSplitFile("/").ext == ""

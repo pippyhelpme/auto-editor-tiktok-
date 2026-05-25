@@ -30,6 +30,8 @@ auto-editor example.mp4 --profile tiktok
 
 Explicit flags override preset values, e.g. `--profile tiktok --margin 0.5sec`.
 
+The preset keeps the first **3 seconds** (the hook window) uncut by default. Disable with `--no-hook-window` or `--profile tiktok:no-hook`.
+
 <h2 align="center">Installing</h2>
 
 See [Installing](https://auto-editor.com/installing) for more information.

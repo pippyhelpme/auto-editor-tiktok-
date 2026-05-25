@@ -1,5 +1,6 @@
 import std/[options, os]
 
+import ../action
 import ../log
 import ../util/[color, fun]
 
@@ -9,9 +10,30 @@ type ProfileField* = enum
 
 type ProfileOverrides* = set[ProfileField]
 
-const tiktokResolution* = (int32(1080), int32(1920))
+type ProfileSpec* = object
+  name*: string
+  hookWindow*: bool
 
-proc applyTiktokPreset*(args: var mainArgs, overrides: ProfileOverrides) =
+const tiktokResolution* = (int32(1080), int32(1920))
+const hookWindowEnd* = "3sec"
+
+proc parseProfileSpec*(raw: string): ProfileSpec =
+  result = ProfileSpec(name: raw, hookWindow: true)
+  let colon = raw.find(':')
+  if colon == -1:
+    return
+  result.name = raw[0 ..< colon]
+  case raw[colon + 1 .. ^1]
+  of "no-hook":
+    result.hookWindow = false
+  else:
+    error("Unknown profile modifier: " & raw[colon + 1 .. ^1])
+
+proc applyHookWindow*(args: var mainArgs) =
+  args.setAction.insert(0, (aNil, parseTime("0"), parseTime(hookWindowEnd)))
+
+proc applyTiktokPreset*(args: var mainArgs, overrides: ProfileOverrides,
+    hookWindow = true) =
   if pfMargin notin overrides:
     args.margin = (pack(true, 150), pack(true, 150)) # 0.15s
   if pfResolution notin overrides:
@@ -29,12 +51,16 @@ proc applyTiktokPreset*(args: var mainArgs, overrides: ProfileOverrides) =
   if pfOutput notin overrides and args.inputs.len > 0:
     let (dir, name, _) = agSplitFile(args.inputs[0])
     args.output = joinPath(dir, name & "_tiktok.mp4")
+  if hookWindow:
+    applyHookWindow(args)
 
 proc applyProfile*(args: var mainArgs, overrides: ProfileOverrides) =
-  case args.profile
+  let spec = parseProfileSpec(args.profile)
+  case spec.name
   of "tiktok":
-    applyTiktokPreset(args, overrides)
+    let hook = spec.hookWindow and not args.noHookWindow
+    applyTiktokPreset(args, overrides, hook)
   of "":
     discard
   else:
-    error("Unknown profile: " & args.profile & "\nAvailable profiles: tiktok")
+    error("Unknown profile: " & spec.name & "\nAvailable profiles: tiktok")

@@ -433,6 +433,16 @@ class Runner:
         cn = fileinfo(out)
         assert cn.videos[0].res == (720, 1280)
 
+    def test_profile_no_hook_window(self) -> None:
+        out = self.main(
+            ["example.mp4"],
+            ["--profile", "tiktok", "--no-hook-window", "--export", "v3"],
+            "tiktok_nohook.v3",
+        )
+        with open(out) as fh:
+            tl = json.load(fh)
+        assert "clips2" in tl or "v" in tl
+
     def test_input_extension(self):
         """Input file must have an extension. Throw error if none is given."""
         path = os.path.join(self.temp_dir, "example")
