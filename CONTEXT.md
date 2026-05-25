@@ -20,7 +20,7 @@ A **fork of [auto-editor](https://github.com/WyattBlue/auto-editor)** (Nim CLI) 
 - **Caption-safe zone** — content top-aligned in upper 75% of frame
 - **Burn-in captions** — FFmpeg `subtitles` filter via libass (Linux/macOS static builds)
 
-Release binaries for primary platforms (linux-x86_64, linux-aarch64, macOS) were blocked by CI tarball hash mismatches; fixed on master (re-run release build to publish assets). Windows pre-built binaries omit burn-in (no libass in cross-build).
+Release binaries are built by GitHub Actions (`release-build` workflow). Attach to [Releases](https://github.com/pippyhelpme/auto-editor-tiktok-/releases). Windows pre-built binaries omit burn-in (no libass in cross-build).
 
 **Creator onboarding:** [docs/creator-quickstart.md](docs/creator-quickstart.md) — install, workflows, modifiers, troubleshooting.
 

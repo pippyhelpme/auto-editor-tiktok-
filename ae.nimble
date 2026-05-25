@@ -504,11 +504,16 @@ proc mesonBuild(package: Package, buildPath: string, kind: CrossKind) =
     &"--prefix={buildPath}",
     "--buildtype=release",
     "--default-library=static",
-    "-Denable_docs=false",
-    "-Denable_tools=false",
-    "-Denable_examples=false",
-    "-Denable_tests=false"
   ]
+  if package.buildArguments.len > 0:
+    mesonArgs.add package.buildArguments
+  else:
+    mesonArgs.add @[
+      "-Denable_docs=false",
+      "-Denable_tools=false",
+      "-Denable_examples=false",
+      "-Denable_tests=false",
+    ]
   if kind == wasm32 or kind == wasm64:
     mesonArgs.add "-Denable_asm=false"
     let memArg = if kind == wasm64: " -sMEMORY64=1" else: ""
