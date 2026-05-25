@@ -336,7 +336,8 @@ proc editMedia*(args: var mainArgs) =
 
     var clips2: seq[Clip2] = @[]
     if args.clipCount > 0:
-      clips2 = selectClips(tlV3, args.clipCount)
+      let signals = if usePath != "": loadClipSignals(usePath, tlV3.tb) else: ClipSignals()
+      clips2 = selectClips(tlV3, args.clipCount, signals = signals)
       if clips2.len == 0:
         error &"No clips matched duration limits ({defaultMinClipSec:g}–{defaultMaxClipSec:g}s). Try fewer silence cuts or adjust --margin."
     else:

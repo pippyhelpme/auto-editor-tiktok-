@@ -42,7 +42,16 @@ Export multiple short clips from one long video:
 auto-editor long.mp4 --profile tiktok --clips 5
 ```
 
-Keeps the longest **15–60 second** segments after the first pass and writes `{stem}_clip01_tiktok.mp4`, `{stem}_clip02_tiktok.mp4`, etc. Same as `--profile tiktok:clips=5`.
+Process every video in a folder (same options for each file):
+
+```
+auto-editor --input-dir ./raw-footage --profile tiktok --clips 3
+auto-editor --input-dir ./raw-footage --profile tiktok --output-dir ./exports
+```
+
+Ranks **15–60 second** kept segments by audio/motion peaks and writes `{stem}_clip01_tiktok.mp4`, `{stem}_clip02_tiktok.mp4`, etc. Same as `--profile tiktok:clips=5`.
+
+**New to TikTok exports?** See [Creator quickstart](docs/creator-quickstart.md) for install, common workflows, and troubleshooting.
 
 <h2 align="center">Installing (this fork)</h2>
 
@@ -260,6 +269,7 @@ auto-editor --help
 ```
 
 ## Articles
+ - [Creator quickstart (TikTok fork)](docs/creator-quickstart.md)
  - [How to Install Auto-Editor](https://auto-editor.com/installing)
  - [All the Options (And What They Do)](https://auto-editor.com/ref/options)
  - [Docs](https://auto-editor.com/docs)

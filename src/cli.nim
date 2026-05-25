@@ -94,6 +94,11 @@ Apply a platform editing preset (e.g. tiktok, tiktok:no-hook, tiktok:clips=5). E
   OptDef(names: "--clips", c: cEdit, datum: "clips", metavar: "N",
     help: """
 Export up to N short clips (15–60s kept segments) instead of one combined file. Use with --profile tiktok for vertical naming ({stem}_clip01_tiktok.mp4)."""),
+  OptDef(names: "--input-dir", c: cEdit, datum: "input-dir", metavar: "DIR",
+    help: """
+Process every video file in a folder with the same options. Outputs stay next to each source unless --output-dir is set."""),
+  OptDef(names: "--output-dir", c: cEdit, datum: "output-dir", metavar: "DIR",
+    help: "Write batch outputs into this directory (requires --input-dir)."),
   OptDef(names: "--no-hook-window", c: cEdit, kind: Flag, datum: "args.noHookWindow",
     help: "Disable keeping the first 3 seconds when using a platform profile"),
   OptDef(names: "--caption-safe-zone", c: cVid, kind: Flag, datum: "args.captionSafeZone",

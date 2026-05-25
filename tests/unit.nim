@@ -2,7 +2,7 @@ import unittest
 import std/[options, os, strutils, tempfiles]
 
 import ../src/[av, conductor, ffmpeg, log, media, timeline, wavutil]
-import ../src/tiktok/[preset, captions, clips]
+import ../src/tiktok/[preset, captions, clips, batch]
 import ../src/action
 import ../src/util/[color, fun, lang, rational]
 import ../src/exports/[kdenlive, fcp11]
@@ -209,7 +209,7 @@ test "parse profile clips modifier":
   check parseProfileSpec("tiktok:clips=5,no-hook").clipCount == 5
   check parseProfileSpec("tiktok:clips=5,no-hook").hookWindow == false
 
-test "select clips ranking":
+test "select clips ranking by duration fallback":
   var tl = v3(
     tb: AVRational(num: 30, den: 1),
     effects: @[aNil, aCut],
@@ -225,9 +225,56 @@ test "select clips ranking":
   check picked[0].start == 900
   check picked[1].start == 0
 
+test "select clips ranking by audio peaks":
+  var tl = v3(
+    tb: AVRational(num: 30, den: 1),
+    effects: @[aNil, aCut],
+    clips2: @[
+      Clip2(start: 0, `end`: 450, effect: 0),      # 15s kept
+      Clip2(start: 450, `end`: 900, effect: 1),    # cut
+      Clip2(start: 900, `end`: 2700, effect: 0),   # 60s kept
+      Clip2(start: 2700, `end`: 3000, effect: 0),  # 10s kept (too short)
+    ],
+  )
+  var audio = newSeq[float32](3000)
+  for i in 0 ..< 450:
+    audio[i] = 0.95'f32
+  for i in 900 ..< 2700:
+    audio[i] = 0.05'f32
+  let picked = selectClips(tl, 2, signals = ClipSignals(audio: audio))
+  check picked.len == 2
+  check picked[0].start == 0
+  check picked[1].start == 900
+
 test "clip output path":
   check clipOutputPath("/tmp/podcast.mp4", "", 0, 3) == "/tmp/podcast_clip01_tiktok.mp4"
   check clipOutputPath("/tmp/podcast.mp4", "", 2, 3) == "/tmp/podcast_clip03_tiktok.mp4"
+
+test "batch media detection":
+  check isMediaFile("/tmp/clip.MP4")
+  check isMediaFile("/tmp/clip.mov")
+  check not isMediaFile("/tmp/readme.txt")
+
+test "batch per-file output paths":
+  var args = mainArgs(profile: "tiktok")
+  check perFileOutput(args, "/raw/podcast.mp4") == "/raw/podcast_tiktok.mp4"
+  args = mainArgs(profile: "tiktok", clipCount: 3)
+  check perFileOutput(args, "/raw/podcast.mp4") == "/raw/podcast.mp4"
+  args = mainArgs(profile: "tiktok", outputDir: "/out")
+  check perFileOutput(args, "/raw/podcast.mp4") == "/out/podcast_tiktok.mp4"
+  args = mainArgs(profile: "tiktok", clipCount: 2, outputDir: "/out")
+  check perFileOutput(args, "/raw/podcast.mp4") == "/out/podcast.mp4"
+
+test "collect media files":
+  let tmp = createTempDir("ae-batch-test")
+  defer: removeDir(tmp)
+  writeFile(tmp / "a.mp4", "")
+  writeFile(tmp / "b.txt", "")
+  writeFile(tmp / "c.mov", "")
+  let files = collectMediaFiles(tmp)
+  check files.len == 2
+  check files[0].endsWith("a.mp4")
+  check files[1].endsWith("c.mov")
 
 test "agSplitFile":
   check agSplitFile("/").ext == ""

@@ -45,6 +45,8 @@ const captionSafeZoneFraction* = 0.75
 
 type mainArgs* = object
   inputs*: seq[string]
+  inputDir*: string = ""
+  outputDir*: string = ""
 
   # Editing Options
   profile*: string = ""

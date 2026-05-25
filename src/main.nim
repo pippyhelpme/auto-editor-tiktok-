@@ -13,7 +13,7 @@ when not defined(windows) and not defined(emscripten):
   import std/posix_utils
 
 import ./[about, action, cli, conductor, edit, ffmpeg, log]
-import ./tiktok/preset
+import ./tiktok/[preset, batch]
 import cmds/[info, desc, cache, levels, subdump, whisper]
 import util/[color, fun, term, rational]
 
@@ -349,6 +349,10 @@ judge making cuts.
       if parseSaturatedNatural(key, count) == 0 or count < 1:
         error("--clips requires a positive integer.")
       args.clipCount = count
+    of "input-dir":
+      args.inputDir = key
+    of "output-dir":
+      args.outputDir = key
     of "burn-captions-path":
       args.burnCaptionsPath = key
       args.burnCaptions = true
@@ -437,6 +441,21 @@ judge making cuts.
     error &"{cmdLineParams[^1]} needs argument."
 
   applyProfile(args, profileOverrides)
+
+  if args.outputDir != "" and args.inputDir == "":
+    error "--output-dir requires --input-dir."
+
+  if args.inputDir != "":
+    if args.inputs.len > 0:
+      error "Use either positional input files or --input-dir, not both."
+    if args.output != "":
+      error "Use --output-dir with --input-dir instead of --output."
+    if not dirExists(args.inputDir):
+      error &"Input directory does not exist: {args.inputDir}"
+    if args.outputDir != "" and not dirExists(args.outputDir):
+      createDir(args.outputDir)
+    runBatch(args)
+    return
 
   if args.burnCaptions:
     args.sn = true
