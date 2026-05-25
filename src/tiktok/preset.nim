@@ -30,7 +30,8 @@ proc parseProfileSpec*(raw: string): ProfileSpec =
     error("Unknown profile modifier: " & raw[colon + 1 .. ^1])
 
 proc applyHookWindow*(args: var mainArgs) =
-  args.setAction.insert(0, (aNil, parseTime("0"), parseTime(hookWindowEnd)))
+  let hookKeep = (aNil, parseTime("0"), parseTime(hookWindowEnd))
+  args.setAction.insert(hookKeep, 0)
 
 proc applyTiktokPreset*(args: var mainArgs, overrides: ProfileOverrides,
     hookWindow = true) =
