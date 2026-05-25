@@ -17,6 +17,7 @@ jobs:
   main:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: ubuntu-24.04
@@ -56,6 +57,8 @@ jobs:
         run: gcc --version
       - name: Build FFmpeg
         run: nimble makeff
+      - name: Verify FFmpeg headers
+        run: test -f build/include/libavutil/rational.h
       - name: Compile
         run: nimble make && mv auto-editor ${{ matrix.binary_name }}
       - name: Test

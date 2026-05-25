@@ -219,12 +219,12 @@ let x264 = Package(
 let freetype = Package(
   name: "freetype",
   sourceUrl: "https://download.savannah.gnu.org/releases/freetype/freetype-2.13.3.tar.xz",
-  sha256: "05597f327362f6aa12a3577ac701875fce8472010c0f6e3404ad4aa3575ebe2",
+  sha256: "0550350666d427c74daeb85d5ac7bb353acba5f76956395995311a9c6f063289",
 )
 let libassPkg = Package(
   name: "libass",
   sourceUrl: "https://github.com/libass/libass/releases/download/0.17.3/libass-0.17.3.tar.xz",
-  sha256: "706af7022181426c0f64982160a577522cdb869a",
+  sha256: "eae425da50f0015c21f7b3a9c7262a910f0218af469e22e2931462fed3c50959",
   buildArguments: @["--disable-require-system-font-provider"],
   ffFlag: "--enable-libass",
 )
