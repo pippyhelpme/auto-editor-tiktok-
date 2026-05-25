@@ -158,22 +158,24 @@ proc makeSolid(width: cint, height: cint, color: RGBColor): ptr AVFrame =
 
   return frame
 
-proc scaleWithPad(src: ptr AVFrame, targetW, targetH: int32, bg: RGBColor): ptr AVFrame =
+proc scaleWithPad(src: ptr AVFrame, targetW, targetH: int32, bg: RGBColor,
+    topAlign = false, maxHeightFrac = 1.0): ptr AVFrame =
   ## Scale src to fit within targetW x targetH preserving aspect ratio,
-  ## centering with bg color padding. Returns a new YUV420P frame.
-  ## Uses sws_scale_frame + manual pixel copy to avoid filter graph NEON
-  ## crashes on Windows ARM64.
+  ## padding with bg color. When topAlign is true, content sits at the top;
+  ## maxHeightFrac limits the vertical area used (e.g. 0.75 for caption-safe zone).
   let srcW = src.width
   let srcH = src.height
 
+  let fitH = max(cint(float(targetH) * maxHeightFrac) and not 1.cint, 2)
+
   # Compute fitted dims (equivalent to scale=force_original_aspect_ratio=decrease)
   var scaledW = targetW
-  var scaledH = targetH
-  if srcW.int * targetH.int > srcH.int * targetW.int:
+  var scaledH = fitH
+  if srcW.int * fitH.int > srcH.int * targetW.int:
     scaledH = cint((srcH.int * targetW.int) div srcW.int) and not 1.cint
     if scaledH < 2: scaledH = 2
-  elif srcH.int * targetW.int > srcW.int * targetH.int:
-    scaledW = cint((srcW.int * targetH.int) div srcH.int) and not 1.cint
+  elif srcH.int * targetW.int > srcW.int * fitH.int:
+    scaledW = cint((srcW.int * fitH.int) div srcH.int) and not 1.cint
     if scaledW < 2: scaledW = 2
 
   # Create background frame (YUV420P, same as makeSolid output)
@@ -211,7 +213,7 @@ proc scaleWithPad(src: ptr AVFrame, targetW, targetH: int32, bg: RGBColor): ptr 
 
   # Even pixel offsets required for YUV420P chroma subsampling
   let ox = ((targetW - scaledW) div 2) and not 1.cint
-  let oy = ((targetH - scaledH) div 2) and not 1.cint
+  let oy = if topAlign: 0.cint else: ((targetH - scaledH) div 2) and not 1.cint
 
   # Copy Y plane
   for y in 0 ..< scaled.height.int:
@@ -548,7 +550,11 @@ proc makeNewVideoFrames*(output: var OutputContainer, tl: v3, args: mainArgs,
         # unscaled, so the resize costs one sws_scale instead of one per frame.
         if didDecode and (frame.width.int32, frame.height.int32) != tl.res:
           let oldFrame = frame
-          frame = scaleWithPad(frame, tl.res[0], tl.res[1], tl.bg)
+          if args.captionSafeZone:
+            frame = scaleWithPad(frame, tl.res[0], tl.res[1], tl.bg, true,
+              captionSafeZoneFraction)
+          else:
+            frame = scaleWithPad(frame, tl.res[0], tl.res[1], tl.bg)
           av_frame_free(addr oldFrame)
 
         # Persist this source's decode position and seek state for next time.

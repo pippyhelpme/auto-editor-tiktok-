@@ -185,7 +185,17 @@ test "tiktok hook window disabled":
 test "parse profile spec":
   check parseProfileSpec("tiktok").name == "tiktok"
   check parseProfileSpec("tiktok").hookWindow
+  check parseProfileSpec("tiktok").captionSafeZone
   check parseProfileSpec("tiktok:no-hook").hookWindow == false
+  check parseProfileSpec("tiktok:no-safe-zone").captionSafeZone == false
+  check parseProfileSpec("tiktok:no-hook,no-safe-zone").hookWindow == false
+  check parseProfileSpec("tiktok:no-hook,no-safe-zone").captionSafeZone == false
+
+test "tiktok caption safe zone flag":
+  var args = mainArgs()
+  args.profile = "tiktok"
+  applyProfile(args, {})
+  check args.captionSafeZone
 
 test "agSplitFile":
   check agSplitFile("/").ext == ""

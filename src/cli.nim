@@ -93,6 +93,10 @@ const mainOptions*: seq[OptDef] = @[
 Apply a platform editing preset (e.g. tiktok, tiktok:no-hook). Explicit flags override preset defaults."""),
   OptDef(names: "--no-hook-window", c: cEdit, kind: Flag, datum: "args.noHookWindow",
     help: "Disable keeping the first 3 seconds when using a platform profile"),
+  OptDef(names: "--caption-safe-zone", c: cVid, kind: Flag, datum: "args.captionSafeZone",
+    help: "Frame video in the upper portion, leaving the bottom 25% clear for TikTok captions"),
+  OptDef(names: "--no-caption-safe-zone", c: cVid, kind: Flag, datum: "args.noCaptionSafeZone",
+    help: "Disable caption-safe reframing when using a platform profile"),
   OptDef(names: "-e, --edit", c: cEdit, datum: "edit", metavar: "METHOD",
       help: """
 Set an expression which determines how to make auto edits. (default is "audio")"""),

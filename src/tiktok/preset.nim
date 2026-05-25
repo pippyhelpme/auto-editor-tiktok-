@@ -1,4 +1,4 @@
-import std/[options, os]
+import std/[options, os, strutils]
 
 import ../action
 import ../log
@@ -13,21 +13,25 @@ type ProfileOverrides* = set[ProfileField]
 type ProfileSpec* = object
   name*: string
   hookWindow*: bool
+  captionSafeZone*: bool
 
 const tiktokResolution* = (int32(1080), int32(1920))
 const hookWindowEnd* = "3sec"
 
 proc parseProfileSpec*(raw: string): ProfileSpec =
-  result = ProfileSpec(name: raw, hookWindow: true)
+  result = ProfileSpec(name: raw, hookWindow: true, captionSafeZone: true)
   let colon = raw.find(':')
   if colon == -1:
     return
   result.name = raw[0 ..< colon]
-  case raw[colon + 1 .. ^1]
-  of "no-hook":
-    result.hookWindow = false
-  else:
-    error("Unknown profile modifier: " & raw[colon + 1 .. ^1])
+  for piece in raw[colon + 1 .. ^1].split(','):
+    case piece.strip
+    of "no-hook":
+      result.hookWindow = false
+    of "no-safe-zone":
+      result.captionSafeZone = false
+    else:
+      error("Unknown profile modifier: " & piece)
 
 proc applyHookWindow*(args: var mainArgs) =
   let hookKeep = (aNil, parseTime("0"), parseTime(hookWindowEnd))
@@ -61,6 +65,8 @@ proc applyProfile*(args: var mainArgs, overrides: ProfileOverrides) =
   of "tiktok":
     let hook = spec.hookWindow and not args.noHookWindow
     applyTiktokPreset(args, overrides, hook)
+    if spec.captionSafeZone and not args.noCaptionSafeZone:
+      args.captionSafeZone = true
   of "":
     discard
   else:

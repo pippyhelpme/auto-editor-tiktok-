@@ -32,6 +32,8 @@ Explicit flags override preset values, e.g. `--profile tiktok --margin 0.5sec`.
 
 The preset keeps the first **3 seconds** (the hook window) uncut by default. Disable with `--no-hook-window` or `--profile tiktok:no-hook`.
 
+Video is reframed to the **upper 75%** of the vertical frame so TikTok's caption UI does not cover important content. Disable with `--no-caption-safe-zone` or `--profile tiktok:no-safe-zone`.
+
 <h2 align="center">Installing</h2>
 
 See [Installing](https://auto-editor.com/installing) for more information.

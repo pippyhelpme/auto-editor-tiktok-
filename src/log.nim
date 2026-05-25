@@ -41,6 +41,8 @@ type
     of nkPeak:
       t*: float32    # -99.0 to 0.0, default -8.0
 
+const captionSafeZoneFraction* = 0.75
+
 type mainArgs* = object
   inputs*: seq[string]
 
