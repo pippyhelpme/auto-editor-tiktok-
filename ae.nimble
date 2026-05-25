@@ -216,6 +216,18 @@ let x264 = Package(
   buildArguments: "--disable-cli --disable-lsmash --disable-swscale --disable-ffms --disable-opencl --enable-strip".split(" "),
   ffFlag: "--enable-libx264",
 )
+let freetype = Package(
+  name: "freetype",
+  sourceUrl: "https://download.savannah.gnu.org/releases/freetype/freetype-2.13.3.tar.xz",
+  sha256: "05597f327362f6aa12a3577ac701875fce8472010c0f6e3404ad4aa3575ebe2",
+)
+let libassPkg = Package(
+  name: "libass",
+  sourceUrl: "https://github.com/libass/libass/releases/download/0.17.3/libass-0.17.3.tar.xz",
+  sha256: "706af7022181426c0f64982160a577522cdb869a",
+  buildArguments: @["--disable-require-system-font-provider"],
+  ffFlag: "--enable-libass",
+)
 let x265 = Package(
   name: "x265",
   sourceUrl: "https://bitbucket.org/multicoreware/x265_git/downloads/x265_4.2.tar.gz",
@@ -239,6 +251,9 @@ proc selectPackages(kind: CrossKind = native): seq[Package] =
   if enableWhisper:
     result.add whisper
   result &= [lame, opus, dav1d, x264]
+  if kind == native:
+    result.add freetype
+    result.add libassPkg
   if not disableVpx:
     result.add vpx
   if not disableSvtAv1:
@@ -723,6 +738,8 @@ proc setupCommonFlags(packages: seq[Package], kind: CrossKind = native): string 
   let enableDemuxers = enableMuxers
 
   var filters = "scale,crop,pad,format,gblur,hflip,lut,negate,vflip,aformat,abuffer,abuffersink,aresample,atempo,anull,anullsrc,volume,loudnorm,asetrate".split(",")
+  if packages.anyIt(it.name == "libass"):
+    filters.add "subtitles"
 
   for package in packages:
     if package.name == "libvpx":
@@ -799,7 +816,7 @@ proc setupDeps =
     exec "pip install " & toInstall.join(" ")
 
 task downloaddeps, "Download and Extract Cxx Dependencies":
-  let allPackages = @[ffmpeg, nvheaders, libvpl, whisper, lame, opus, dav1d, x264, vpx, svtav1, x265]
+  let allPackages = @[ffmpeg, nvheaders, libvpl, whisper, lame, opus, dav1d, x264, freetype, libassPkg, vpx, svtav1, x265]
   mkDir "ffmpeg_sources"
   withDir "ffmpeg_sources":
     for package in allPackages:

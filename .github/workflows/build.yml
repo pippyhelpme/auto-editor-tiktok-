@@ -1,8 +1,16 @@
-name: build
+name: release-build
 on:
   release:
     types: [published]
+  push:
+    tags:
+      - "v*"
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to attach binaries to
+        required: true
+        default: v0.1.0-tiktok
 permissions:
   contents: write
 jobs:
@@ -12,13 +20,13 @@ jobs:
       matrix:
         include:
           - os: ubuntu-24.04
-            binary_name: auto-editor-linux-x86_64
+            binary_name: auto-editor-tiktok-linux-x86_64
           - os: ubuntu-24.04-arm
-            binary_name: auto-editor-linux-aarch64
+            binary_name: auto-editor-tiktok-linux-aarch64
           - os: macos-15-intel
-            binary_name: auto-editor-macos-x86_64
+            binary_name: auto-editor-tiktok-macos-x86_64
           - os: macos-latest
-            binary_name: auto-editor-macos-arm64
+            binary_name: auto-editor-tiktok-macos-arm64
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -52,11 +60,10 @@ jobs:
         run: nimble make && mv auto-editor ${{ matrix.binary_name }}
       - name: Test
         run: nimble test
-
       - name: Upload to Release
-        if: github.event_name == 'release'
         uses: softprops/action-gh-release@v3
         with:
+          tag_name: ${{ github.event.release.tag_name || inputs.tag || github.ref_name }}
           files: ${{ matrix.binary_name }}*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -79,12 +86,12 @@ jobs:
       - name: Build FFmpeg
         run: nimble makeffwin
       - name: Compile
-        run: nimble makewin && mv auto-editor.exe auto-editor-windows-x86_64.exe
+        run: nimble makewin && mv auto-editor.exe auto-editor-tiktok-windows-x86_64.exe
       - name: Upload to Release
-        if: github.event_name == 'release'
         uses: softprops/action-gh-release@v3
         with:
-          files: auto-editor-windows-x86_64.exe
+          tag_name: ${{ github.event.release.tag_name || inputs.tag || github.ref_name }}
+          files: auto-editor-tiktok-windows-x86_64.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -109,12 +116,12 @@ jobs:
       - name: Build FFmpeg
         run: nimble makeffwinarm
       - name: Compile
-        run: nimble makewinarm && mv auto-editor.exe auto-editor-windows-aarch64.exe
+        run: nimble makewinarm && mv auto-editor.exe auto-editor-tiktok-windows-aarch64.exe
       - name: Upload to Release
-        if: github.event_name == 'release'
         uses: softprops/action-gh-release@v3
         with:
-          files: auto-editor-windows-aarch64.exe
+          tag_name: ${{ github.event.release.tag_name || inputs.tag || github.ref_name }}
+          files: auto-editor-tiktok-windows-aarch64.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -140,11 +147,11 @@ jobs:
       - name: Build FFmpeg
         run: nimble makeffarmv7
       - name: Compile
-        run: nimble makearmv7 && mv auto-editor auto-editor-linux-armv7
+        run: nimble makearmv7 && mv auto-editor auto-editor-tiktok-linux-armv7
       - name: Upload to Release
-        if: github.event_name == 'release'
         uses: softprops/action-gh-release@v3
         with:
-          files: auto-editor-linux-armv7
+          tag_name: ${{ github.event.release.tag_name || inputs.tag || github.ref_name }}
+          files: auto-editor-tiktok-linux-armv7
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

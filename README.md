@@ -38,9 +38,30 @@ Embedded or file-based captions can be **burned in** with `--burn-captions` (or 
 
 <h2 align="center">Installing (this fork)</h2>
 
-Pre-built binaries for **auto-editor-tiktok** are not published yet. Build from source:
+### Pre-built binaries (recommended)
 
-### Requirements
+Download a static binary for your platform from the [Releases page](https://github.com/pippyhelpme/auto-editor-tiktok-/releases):
+
+| Platform | Asset |
+|----------|-------|
+| Linux x86_64 | `auto-editor-tiktok-linux-x86_64` |
+| Linux ARM64 | `auto-editor-tiktok-linux-aarch64` |
+| Linux ARMv7 | `auto-editor-tiktok-linux-armv7` |
+| macOS Intel | `auto-editor-tiktok-macos-x86_64` |
+| macOS Apple Silicon | `auto-editor-tiktok-macos-arm64` |
+| Windows x86_64 | `auto-editor-tiktok-windows-x86_64.exe` |
+| Windows ARM64 | `auto-editor-tiktok-windows-aarch64.exe` |
+
+```bash
+chmod +x auto-editor-tiktok-linux-x86_64
+./auto-editor-tiktok-linux-x86_64 example.mp4 --profile tiktok
+```
+
+Burn-in captions (`--burn-captions`) require the Linux/macOS static builds (libass bundled). Windows pre-built binaries do not include burn-in yet.
+
+### Build from source
+
+If no binary matches your platform, build locally:
 
 - **Nim** 2.2.2+ and **nimble**
 - A C compiler (gcc or clang)
@@ -60,8 +81,6 @@ sudo apt install nim nimble gcc libavcodec-dev libavformat-dev libavutil-dev \
 
 **Install Nim** (if needed): https://nim-lang.org/install.html
 
-### Build
-
 ```bash
 git clone https://github.com/pippyhelpme/auto-editor-tiktok-.git
 cd auto-editor-tiktok-
@@ -70,7 +89,8 @@ nimble brewmake
 
 This produces `./auto-editor` in the repo root (dynamically linked to system FFmpeg).
 
-For a fully static binary (longer build, bundles FFmpeg):
+For a fully static binary (longer build, bundles FFmpeg + libass):
+
 ```bash
 nimble makeff   # download & compile FFmpeg (~30+ min)
 nimble make
