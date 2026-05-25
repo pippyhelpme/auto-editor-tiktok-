@@ -62,6 +62,9 @@ when defined(gcc):
 if not defined(dynamic):
   # Core FFmpeg libraries
   switch("passL", "-lavfilter -lavformat -lavcodec -lswresample -lswscale -lavutil")
+  when (hostOS == "linux" or hostOS == "macosx") and not defined(emscripten):
+    # subtitles filter → libass (bundled in native static builds only)
+    switch("passL", "-lass -lharfbuzz -lfribidi -lfreetype")
   # Codec libraries
   switch("passL", "-lmp3lame -lopus -lx264 -ldav1d")
   if enableVpx:

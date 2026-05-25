@@ -868,14 +868,16 @@ task makeff, "Build FFmpeg from source":
     pkgConfigPaths.add(buildPath / "lib/cmake")
     pkgConfigPaths.add(buildPath / "share/pkgconfig")
   putEnv("PKG_CONFIG_PATH", pkgConfigPaths.join(":"))
+  putEnv("PKG_CONFIG_LIBDIR", pkgConfigPaths.join(":"))
 
+  let pkgConfigPath = pkgConfigPaths.join(":")
   let packages = ffmpegSetup(buildPath)
 
   let ffmpegBuildDir = buildPath / "pkg" / "ffmpeg"
   mkDir(ffmpegBuildDir)
   withDir ffmpegBuildDir:
     try:
-      exec &"""{ffmpegSrcDir}/configure --prefix="{buildPath}" \
+      exec &"""PKG_CONFIG_PATH="{pkgConfigPath}" PKG_CONFIG_LIBDIR="{pkgConfigPath}" {ffmpegSrcDir}/configure --prefix="{buildPath}" \
         --pkg-config-flags="--static" \
         --extra-cflags="-I{buildPath}/include" \
         --extra-ldflags="-L{buildPath}/lib" \
