@@ -36,10 +36,61 @@ Video is reframed to the **upper 75%** of the vertical frame so TikTok's caption
 
 Embedded or file-based captions can be **burned in** with `--burn-captions` (or `--captions FILE`). The TikTok profile enables burn-in when captions are available. Disable with `--no-burn-captions` or `--profile tiktok:no-burn-captions`.
 
-<h2 align="center">Installing</h2>
+<h2 align="center">Installing (this fork)</h2>
 
-See [Installing](https://auto-editor.com/installing) for more information.
+Pre-built binaries for **auto-editor-tiktok** are not published yet. Build from source:
 
+### Requirements
+
+- **Nim** 2.2.2+ and **nimble**
+- A C compiler (gcc or clang)
+- **FFmpeg development libraries** — `libavcodec`, `libavformat`, `libavutil`, `libavfilter`, `libswscale`, `libswresample`
+- **libass** — required for `--burn-captions` / TikTok burn-in
+
+**Fedora / RHEL:**
+```bash
+sudo dnf install nim gcc nimble ffmpeg-free-devel libass-devel
+```
+
+**Debian / Ubuntu:**
+```bash
+sudo apt install nim nimble gcc libavcodec-dev libavformat-dev libavutil-dev \
+  libavfilter-dev libswscale-dev libswresample-dev libass-dev
+```
+
+**Install Nim** (if needed): https://nim-lang.org/install.html
+
+### Build
+
+```bash
+git clone https://github.com/pippyhelpme/auto-editor-tiktok-.git
+cd auto-editor-tiktok-
+nimble brewmake
+```
+
+This produces `./auto-editor` in the repo root (dynamically linked to system FFmpeg).
+
+For a fully static binary (longer build, bundles FFmpeg):
+```bash
+nimble makeff   # download & compile FFmpeg (~30+ min)
+nimble make
+```
+
+### Verify
+
+```bash
+./auto-editor --version
+./auto-editor example.mp4 --profile tiktok --preview
+```
+
+### Tests
+
+```bash
+nimble test                              # Nim unit tests
+python tests/test.py -n test_profile_tiktok test_burn_captions_movtext
+```
+
+Upstream install methods (without TikTok features): [auto-editor.com/installing](https://auto-editor.com/installing)
 
 <h2 align="center">Cutting</h2>
 

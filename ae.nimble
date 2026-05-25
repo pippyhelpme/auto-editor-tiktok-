@@ -1,7 +1,7 @@
 # Package
 version = "0.0.0"
 author = "WyattBlue"
-description = "Effort free video editing!"
+description = "Effort free video editing for TikTok — auto-editor fork with --profile tiktok"
 license = "Unlicense"
 srcDir = "src"
 bin = @["main=auto-editor"]
