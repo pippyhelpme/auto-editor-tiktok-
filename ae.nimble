@@ -228,6 +228,22 @@ let fribidi = Package(
   buildSystem: "meson",
   buildArguments: @["-Ddocs=false", "-Dtests=false"],
 )
+let harfbuzz = Package(
+  name: "harfbuzz",
+  sourceUrl: "https://github.com/harfbuzz/harfbuzz/releases/download/9.0.0/harfbuzz-9.0.0.tar.xz",
+  sha256: "a41b272ceeb920c57263ec851604542d9ec85ee3030506d94662067c7b6ab89e",
+  buildSystem: "meson",
+  buildArguments: @[
+    "-Dglib=disabled",
+    "-Dgobject=disabled",
+    "-Dcairo=disabled",
+    "-Dicu=disabled",
+    "-Dtests=disabled",
+    "-Ddocs=disabled",
+    "-Dbenchmark=disabled",
+    "-Dintrospection=disabled",
+  ],
+)
 let libassPkg = Package(
   name: "libass",
   sourceUrl: "https://github.com/libass/libass/releases/download/0.17.3/libass-0.17.3.tar.xz",
@@ -261,6 +277,7 @@ proc selectPackages(kind: CrossKind = native): seq[Package] =
   if kind == native:
     result.add freetype
     result.add fribidi
+    result.add harfbuzz
     result.add libassPkg
   if not disableVpx:
     result.add vpx
@@ -829,7 +846,7 @@ proc setupDeps =
     exec "pip install " & toInstall.join(" ")
 
 task downloaddeps, "Download and Extract Cxx Dependencies":
-  let allPackages = @[ffmpeg, nvheaders, libvpl, whisper, lame, opus, dav1d, x264, freetype, fribidi, libassPkg, vpx, svtav1, x265]
+  let allPackages = @[ffmpeg, nvheaders, libvpl, whisper, lame, opus, dav1d, x264, freetype, fribidi, harfbuzz, libassPkg, vpx, svtav1, x265]
   mkDir "ffmpeg_sources"
   withDir "ffmpeg_sources":
     for package in allPackages:
