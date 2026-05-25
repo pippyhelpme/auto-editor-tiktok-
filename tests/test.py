@@ -412,6 +412,27 @@ class Runner:
         for margin, export in random.sample(combos, k=4):
             self.main(inputs, ["-m", margin, "--export", export])
 
+    def test_profile_tiktok(self) -> None:
+        out = self.main(
+            ["example.mp4"],
+            ["--profile", "tiktok"],
+            "tiktok_out.mp4",
+        )
+        cn = fileinfo(out)
+        assert cn.videos[0].res == (1080, 1920)
+
+    def test_profile_unknown(self) -> None:
+        self.check(["example.mp4", "--profile", "youtube"], "Unknown profile")
+
+    def test_profile_override(self) -> None:
+        out = self.main(
+            ["example.mp4"],
+            ["--profile", "tiktok", "-m", "0.5sec", "-res", "720,1280"],
+            "tiktok_override.mp4",
+        )
+        cn = fileinfo(out)
+        assert cn.videos[0].res == (720, 1280)
+
     def test_input_extension(self):
         """Input file must have an extension. Throw error if none is given."""
         path = os.path.join(self.temp_dir, "example")

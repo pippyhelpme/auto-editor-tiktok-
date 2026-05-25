@@ -13,6 +13,23 @@ Before doing the real editing, you first cut out the "dead space" which is typic
 auto-editor path/to/your/video.mp4
 ```
 
+<h2 align="center">TikTok preset</h2>
+
+This fork adds a platform preset for short-form vertical video:
+
+```
+auto-editor example.mp4 --profile tiktok
+```
+
+`--profile tiktok` applies TikTok-oriented defaults:
+
+- **1080×1920** vertical frame (letterboxed/pillarboxed with black bars)
+- **0.15s** margin for snappier pacing
+- **H.264** encode with CRF 23, `medium` encoder preset, `high` profile
+- Output named `{stem}_tiktok.mp4` when `--output` is not set
+
+Explicit flags override preset values, e.g. `--profile tiktok --margin 0.5sec`.
+
 <h2 align="center">Installing</h2>
 
 See [Installing](https://auto-editor.com/installing) for more information.

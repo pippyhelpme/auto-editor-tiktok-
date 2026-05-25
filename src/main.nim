@@ -13,6 +13,7 @@ when not defined(windows) and not defined(emscripten):
   import std/posix_utils
 
 import ./[about, action, cli, conductor, edit, ffmpeg, log]
+import ./tiktok/preset
 import cmds/[info, desc, cache, levels, subdump, whisper]
 import util/[color, fun, term, rational]
 
@@ -321,6 +322,7 @@ judge making cuts.
   var showVersion: bool = false
   var expecting: string = ""
   var licenseKey: string
+  var profileOverrides: ProfileOverrides
 
   let cmdLineParams = commandLineParams()
   for key in cmdLineParams:
@@ -339,6 +341,9 @@ judge making cuts.
       args.`export` = key
     of "output":
       args.output = key
+      profileOverrides.incl pfOutput
+    of "profile":
+      args.profile = key
     of "when-silent":
       args.whenSilent = parseActions(key)
     of "when-normal":
@@ -371,14 +376,17 @@ judge making cuts.
       args.scale = parseNum(key, expecting)
     of "resolution":
       args.resolution = parseResolution(key, expecting)
+      profileOverrides.incl pfResolution
     of "background":
       args.background = some(parseColor(key))
+      profileOverrides.incl pfBackground
     of "sample-rate":
       args.sampleRate = parseSampleRate(key)
     of "frame-rate":
       args.frameRate = parseFrameRate(key)
     of "vcodec":
       args.videoCodec = key
+      profileOverrides.incl pfVideoCodec
     of "video-bitrate":
       args.videoBitrate = parseBitrate(key)
     of "crf":
@@ -386,10 +394,13 @@ judge making cuts.
       discard parseSaturatedNatural(key, val)
       if val >= 65: error "constant rate factor is too high: " & key
       args.crf = val.int8
+      profileOverrides.incl pfCrf
     of "vprofile":
       args.vprofile = key
+      profileOverrides.incl pfVprofile
     of "preset":
       args.preset = key
+      profileOverrides.incl pfEncoderPreset
     of "acodec":
       args.audioCodec = key
     of "layout":
@@ -405,6 +416,7 @@ judge making cuts.
         error &"{key} is not a choice for --progress\nchoices are:\n  modern, classic, ascii, machine, none"
     of "margin":
       args.margin = parseTwoLengths(key, expecting)
+      profileOverrides.incl pfMargin
     of "smooth":
       args.smooth = parseTwoLengths(key, expecting)
     of "key":
@@ -415,6 +427,8 @@ judge making cuts.
 
   if expecting != "":
     error &"{cmdLineParams[^1]} needs argument."
+
+  applyProfile(args, profileOverrides)
 
   if showVersion:
     echo version

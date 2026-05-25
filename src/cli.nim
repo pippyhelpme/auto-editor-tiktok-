@@ -88,6 +88,8 @@ const whisperOptions*: seq[OptDef] = @[
 ]
 
 const mainOptions*: seq[OptDef] = @[
+  OptDef(names: "--profile", c: cEdit, datum: "profile", metavar: "NAME",
+    help: "Apply a platform editing preset (e.g. tiktok). Explicit flags override preset defaults."),
   OptDef(names: "-e, --edit", c: cEdit, datum: "edit", metavar: "METHOD",
       help: """
 Set an expression which determines how to make auto edits. (default is "audio")"""),

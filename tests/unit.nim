@@ -1,7 +1,8 @@
 import unittest
-import std/[os, tempfiles]
+import std/[options, os, strutils, tempfiles]
 
-import ../src/[av, conductor, ffmpeg, media, timeline, wavutil]
+import ../src/[av, conductor, ffmpeg, log, media, timeline, wavutil]
+import ../src/tiktok/preset
 import ../src/util/[color, fun, lang, rational]
 import ../src/exports/[kdenlive, fcp11]
 import ../src/vendor/tinyre/tinyre
@@ -144,6 +145,28 @@ test "re":
 
 test "smpte":
   check parseSMPTE("13:44:05:21", AVRational(num: 24000, den: 1001)) == 1186701
+
+test "tiktok preset":
+  var args = mainArgs()
+  args.inputs.add "folder/clip.mp4"
+  applyTiktokPreset(args, {})
+  check args.resolution == tiktokResolution
+  check args.margin[0].getNumber == 150
+  check args.margin[1].getNumber == 150
+  check endsWith(args.output, "_tiktok.mp4")
+  check args.crf == 23
+  check args.preset == "medium"
+  check args.vprofile == "high"
+  check args.videoCodec == "libx264"
+  check args.background == some(RGBColor(red: 0, green: 0, blue: 0))
+
+test "tiktok preset respects overrides":
+  var args = mainArgs()
+  args.margin = (pack(true, 500), pack(true, 500))
+  applyTiktokPreset(args, {pfMargin})
+  check args.margin[0].getNumber == 500
+  check args.margin[1].getNumber == 500
+  check args.resolution == tiktokResolution
 
 test "agSplitFile":
   check agSplitFile("/").ext == ""

@@ -45,6 +45,7 @@ type mainArgs* = object
   inputs*: seq[string]
 
   # Editing Options
+  profile*: string = ""
   margin*: (PackedInt, PackedInt) = (pack(true, 200), pack(true, 200)) # 0.2s
   smooth*: (PackedInt, PackedInt) = (pack(true, 200), pack(true, 100)) # 0.2s,0.1s
   edit*: string = "audio"
