@@ -2,7 +2,7 @@
 
 Use this on **Linux first** (your platform). Goal: prove `--profile tiktok` workflows before any Windows release-engineering or multi-hour CI builds.
 
-**Install:** [README — Linux release binary](../README.md#installing-this-fork) or build locally on Fedora (`nimble make` after `nimble makeff`).
+**Install:** [v0.2.0-tiktok Linux release binary](https://github.com/pippyhelpme/auto-editor-tiktok-/releases/tag/v0.2.0-tiktok) — download, `chmod +x`, run as `auto-editor`. No local build.
 
 ---
 

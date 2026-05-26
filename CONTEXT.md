@@ -28,7 +28,7 @@ Release binaries are built by GitHub Actions (`release-build` workflow). Attach 
 
 **North star (now):** **Linux-first** — you dogfood on Linux; prove `--profile tiktok` workflows before investing in cross-platform release engineering.
 
-**Phase 1 — dogfood on Linux (now):** Use the [Linux release binary](https://github.com/pippyhelpme/auto-editor-tiktok-/releases) or `nimble make` locally. Run the five workflows in [creator-validation.md](docs/creator-validation.md). File issues for anything broken. No Windows cross-build or multi-hour CI release runs until this passes.
+**Phase 1 — dogfood on Linux (now):** Use the **[Linux release binary](https://github.com/pippyhelpme/auto-editor-tiktok-/releases)** (not a local `nimble makeff` / cross-build). Run the five workflows in [creator-validation.md](docs/creator-validation.md). File issues for anything broken.
 
 **Phase 2 — creator validation:** Triage Phase 1 issues, then recruit 2–3 creators (same doc). Feedback drives v0.4+ features.
 
@@ -68,6 +68,7 @@ Use these terms for TikTok-facing work. Do **not** invent synonyms once defined 
 | **Batch folder export** | Process every video in a folder with the same CLI options via `--input-dir DIR`. Optional `--output-dir DIR` collects outputs in one place. Implemented in `src/tiktok/batch.nim`. |
 | **Creator quickstart** | Onboarding doc for TikTok creators: first export, workflows, profile modifiers, troubleshooting. See `docs/creator-quickstart.md`. |
 | **Creator validation** | Dogfood checklist + recruited-creator feedback template before v0.4 feature work. See `docs/creator-validation.md`. |
+| **Dogfood method** | Validate with the **Linux release binary** from GitHub Releases — same artifact creators get; no local FFmpeg/libass build during Phase 1. |
 | **Deferred platform work** | Windows libass in cross-build release binaries. Not blocking Linux dogfood. |
 
 ## Code layout
