@@ -328,11 +328,14 @@ proc getFileHash(filename: string): string =
   return output.split()[0]
 
 proc download(package: Package) =
-  if not fileExists(package.location):
-    exec &"curl -O -L {package.sourceUrl}"
-  let hash = getFileHash(package.location)
+  let tarball = absolutePath(package.location)
+  if not fileExists(tarball):
+    exec &"curl -o {package.location} -L {package.sourceUrl}"
+  if not fileExists(tarball):
+    raise newException(IOError, "Download failed: " & tarball)
+  let hash = getFileHash(tarball)
   if package.sha256 != hash:
-    echo &"{package.location}\nsha256 hash of {package.name} tarball do not match!"
+    echo &"{tarball}\nsha256 hash of {package.name} tarball do not match!"
     echo &"Expected: {package.sha256}\nGot: {hash}"
     quit(1)
 
