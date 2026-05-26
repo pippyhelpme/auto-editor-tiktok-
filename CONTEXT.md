@@ -18,11 +18,19 @@ A **fork of [auto-editor](https://github.com/WyattBlue/auto-editor)** (Nim CLI) 
 - Vertical **1080×1920** defaults, snappier margin, H.264 encode, `{stem}_tiktok.mp4` output
 - **Hook window** — first 3s kept uncut (`--set-action nil,0,3sec`)
 - **Caption-safe zone** — content top-aligned in upper 75% of frame
-- **Burn-in captions** — FFmpeg `subtitles` filter via libass (Linux/macOS static builds)
+- **Burn-in captions** — FFmpeg `subtitles` filter via libass (static release builds, all platforms)
 
-Release binaries are built by GitHub Actions (`release-build` workflow). Attach to [Releases](https://github.com/pippyhelpme/auto-editor-tiktok-/releases). Windows pre-built binaries omit burn-in (no libass in cross-build).
+Release binaries are built by GitHub Actions (`release-build` workflow). Attach to [Releases](https://github.com/pippyhelpme/auto-editor-tiktok-/releases). Windows cross-builds bundle libass for burn-in (same stack as Linux/macOS); verified in CI via `smoke` / `release-build` jobs.
 
 **Creator onboarding:** [docs/creator-quickstart.md](docs/creator-quickstart.md) — install, workflows, modifiers, troubleshooting.
+
+## Current plan (2026-05-26)
+
+**North star:** Platform parity — Windows release binaries support **burn-in captions** (libass), matching Linux/macOS.
+
+**Phase 1 — v0.3 (platform parity, in progress):** Bundle freetype → fribidi → harfbuzz → libass in Windows cross-compile builds (`gccWin`, `llvmWin` in `ae.nimble`). Link the libass stack in `config.nims` for `defined(windows)` static builds. Verification is **CI-only** — `smoke` on PRs and `release-build` on tags; no local `nimble makeffwin` runs during development.
+
+**Phase 2 — creator validation (next):** Dogfood five workflows yourself ([creator-validation.md](docs/creator-validation.md)), triage issues, then recruit 2–3 creators with the feedback template in that doc. Feedback drives v0.4+ (smarter clip ranking, distribution, etc.).
 
 ## Glossary — inherited from auto-editor
 
@@ -57,6 +65,7 @@ Use these terms for TikTok-facing work. Do **not** invent synonyms once defined 
 | **Clip ranking** | Ranks candidate kept segments by **audio/motion peak scores** from cached analysis (written during the normal `--edit` pass). Falls back to longest-in-range when no cache is available. Implemented in `src/tiktok/clips.nim`. |
 | **Batch folder export** | Process every video in a folder with the same CLI options via `--input-dir DIR`. Optional `--output-dir DIR` collects outputs in one place. Implemented in `src/tiktok/batch.nim`. |
 | **Creator quickstart** | Onboarding doc for TikTok creators: first export, workflows, profile modifiers, troubleshooting. See `docs/creator-quickstart.md`. |
+| **Creator validation** | Dogfood checklist + recruited-creator feedback template before v0.4 feature work. See `docs/creator-validation.md`. |
 
 ## Code layout
 

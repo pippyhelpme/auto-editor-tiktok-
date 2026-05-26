@@ -17,8 +17,8 @@ else:
   let buildPath = (
     if hostCPU == "wasm32": "build_wasm"
     elif defined(emscripten): "build_wasm64"
-    elif hostOS == "windows" and hostCPU == "arm64": "build_winarm"
-    elif hostOS == "windows" and hostCPU != "arm64": "build_win"
+    elif defined(windows) and hostCPU == "arm64": "build_winarm"
+    elif defined(windows): "build_win"
     elif hostOS == "linux" and hostCPU == "arm": "build_armv7"
     else: "build"
   )
@@ -62,8 +62,8 @@ when defined(gcc):
 if not defined(dynamic):
   # Core FFmpeg libraries
   switch("passL", "-lavfilter -lavformat -lavcodec -lswresample -lswscale -lavutil")
-  when (hostOS == "linux" or hostOS == "macosx") and not defined(emscripten):
-    # subtitles filter → libass (bundled in native static builds only)
+  when not defined(emscripten) and (hostOS == "linux" or hostOS == "macosx" or defined(windows)):
+    # subtitles filter → libass (bundled in static builds, including Windows cross-compile)
     switch("passL", "-lass -lharfbuzz -lfribidi -lfreetype -lz")
     when hostOS == "macosx":
       switch("passL", "-lbz2 -liconv -framework CoreText")

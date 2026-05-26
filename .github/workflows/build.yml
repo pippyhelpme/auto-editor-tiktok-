@@ -88,6 +88,11 @@ jobs:
           sudo apt-get install -y build-essential pkg-config nasm git
       - name: Build FFmpeg
         run: nimble makeffwin
+      - name: Verify libass stack for burn-in
+        run: |
+          test -f build_win/lib/pkgconfig/libass.pc
+          test -f build_win/lib/libass.a
+          grep -q '^CONFIG_LIBASS=yes' build_win/pkg/ffmpeg/ffbuild/config.mak
       - name: Compile
         run: nimble makewin && mv auto-editor.exe auto-editor-tiktok-windows-x86_64.exe
       - name: Upload to Release
@@ -118,6 +123,11 @@ jobs:
           echo "$PWD/llvm-mingw-20260311-ucrt-ubuntu-22.04-aarch64/bin" >> $GITHUB_PATH
       - name: Build FFmpeg
         run: nimble makeffwinarm
+      - name: Verify libass stack for burn-in
+        run: |
+          test -f build_winarm/lib/pkgconfig/libass.pc
+          test -f build_winarm/lib/libass.a
+          grep -q '^CONFIG_LIBASS=yes' build_winarm/pkg/ffmpeg/ffbuild/config.mak
       - name: Compile
         run: nimble makewinarm && mv auto-editor.exe auto-editor-tiktok-windows-aarch64.exe
       - name: Upload to Release

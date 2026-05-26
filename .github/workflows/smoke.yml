@@ -133,6 +133,11 @@ jobs:
           echo "DISABLE_HEVC=1" >> $GITHUB_ENV
       - name: Build FFmpeg
         run: nimble makeffwin
+      - name: Verify libass stack for burn-in
+        run: |
+          test -f build_win/lib/pkgconfig/libass.pc
+          test -f build_win/lib/libass.a
+          grep -q '^CONFIG_LIBASS=yes' build_win/pkg/ffmpeg/ffbuild/config.mak
       - name: Compile
         run: nimble makewin
       - name: Upload artifact
@@ -190,6 +195,11 @@ jobs:
           echo "DISABLE_HEVC=1" >> $GITHUB_ENV
       - name: Build FFmpeg
         run: nimble makeffwinarm
+      - name: Verify libass stack for burn-in
+        run: |
+          test -f build_winarm/lib/pkgconfig/libass.pc
+          test -f build_winarm/lib/libass.a
+          grep -q '^CONFIG_LIBASS=yes' build_winarm/pkg/ffmpeg/ffbuild/config.mak
       - name: Compile
         run: nimble makewinarm
       - name: Upload artifact

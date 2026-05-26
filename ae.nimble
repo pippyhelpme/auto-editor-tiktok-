@@ -274,7 +274,7 @@ proc selectPackages(kind: CrossKind = native): seq[Package] =
   if enableWhisper:
     result.add whisper
   result &= [lame, opus, dav1d, x264]
-  if kind == native:
+  if kind == native or kind == gccWin or kind == llvmWin:
     result.add freetype
     result.add fribidi
     result.add harfbuzz
@@ -889,13 +889,15 @@ task makeff, "Build FFmpeg from source":
 
 task makeffwin, "Build FFmpeg for Windows cross-compilation":
   setupDeps()
-  putEnv("PKG_CONFIG_PATH", winBuildPath / "lib/pkgconfig")
+  let pkgConfigPath = winBuildPath / "lib/pkgconfig"
+  putEnv("PKG_CONFIG_PATH", pkgConfigPath)
+  putEnv("PKG_CONFIG_LIBDIR", pkgConfigPath)
   let packages = ffmpegSetup(winBuildPath)
 
   let ffmpegBuildDirWin = winBuildPath / "pkg" / "ffmpeg"
   mkDir(ffmpegBuildDirWin)
   withDir ffmpegBuildDirWin:
-    exec (&"""CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ AR=x86_64-w64-mingw32-ar STRIP=x86_64-w64-mingw32-strip RANLIB=x86_64-w64-mingw32-ranlib PKG_CONFIG_PATH="{winBuildPath}/lib/pkgconfig" {ffmpegSrcDir}/configure --prefix="{winBuildPath}" \
+    exec (&"""CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ AR=x86_64-w64-mingw32-ar STRIP=x86_64-w64-mingw32-strip RANLIB=x86_64-w64-mingw32-ranlib PKG_CONFIG_PATH="{pkgConfigPath}" PKG_CONFIG_LIBDIR="{pkgConfigPath}" {ffmpegSrcDir}/configure --prefix="{winBuildPath}" \
       --pkg-config-flags="--static" \
       --extra-cflags="-I{winBuildPath}/include" \
       --extra-ldflags="-L{winBuildPath}/lib" \
