@@ -28,7 +28,7 @@ Release binaries are built by GitHub Actions (`release-build` workflow). Attach 
 
 **North star:** Platform parity — Windows release binaries support **burn-in captions** (libass), matching Linux/macOS.
 
-**Phase 1 — v0.3 (platform parity, in progress):** Bundle freetype → fribidi → harfbuzz → libass in Windows cross-compile builds (`gccWin`, `llvmWin` in `ae.nimble`). Link the libass stack in `config.nims` for `defined(windows)` static builds. Verification is **CI-only** — `smoke` on PRs and `release-build` on tags; no local `nimble makeffwin` runs during development.
+**Phase 1 — v0.3 (platform parity, in progress):** Bundle zlib → freetype → fribidi → harfbuzz → libass in Windows cross-compile builds (`gccWin`, `llvmWin` in `ae.nimble`). Link the libass stack in `config.nims` for `defined(windows)` static builds. Verification is **CI-only** — `smoke` on PRs and `release-build` on tags; no local `nimble makeffwin` runs during development.
 
 **Phase 2 — creator validation (next):** Dogfood five workflows yourself ([creator-validation.md](docs/creator-validation.md)), triage issues, then recruit 2–3 creators with the feedback template in that doc. Feedback drives v0.4+ (smarter clip ranking, distribution, etc.).
 

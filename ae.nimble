@@ -223,8 +223,8 @@ let freetype = Package(
 )
 let zlibPkg = Package(
   name: "zlib",
-  sourceUrl: "https://zlib.net/zlib-1.3.1.tar.gz",
-  sha256: "cc0b4e42510d49c6decd464123ecf3b14ae9b4ed2ee64893e2d6520a264",
+  sourceUrl: "https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz",
+  sha256: "9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b72df23",
 )
 let fribidi = Package(
   name: "fribidi",
@@ -330,12 +330,11 @@ proc getFileHash(filename: string): string =
 proc download(package: Package) =
   if not fileExists(package.location):
     exec &"curl -O -L {package.sourceUrl}"
-    let filename = "ffmpeg_sources" / package.location
-    let hash = getFileHash(filename)
-    if package.sha256 != hash:
-      echo &"{filename}\nsha256 hash of {package.name} tarball do not match!"
-      echo &"Expected: {package.sha256}\nGot: {hash}"
-      quit(1)
+  let hash = getFileHash(package.location)
+  if package.sha256 != hash:
+    echo &"{package.location}\nsha256 hash of {package.name} tarball do not match!"
+    echo &"Expected: {package.sha256}\nGot: {hash}"
+    quit(1)
 
 proc extract(package: Package) =
   if not dirExists(package.name):
