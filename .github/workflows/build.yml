@@ -92,6 +92,7 @@ jobs:
         run: |
           test -f build_win/lib/pkgconfig/libass.pc
           test -f build_win/lib/libass.a
+          test -f build_win/lib/libz.a
           grep -q '^CONFIG_LIBASS=yes' build_win/pkg/ffmpeg/ffbuild/config.mak
       - name: Compile
         run: nimble makewin && mv auto-editor.exe auto-editor-tiktok-windows-x86_64.exe
@@ -130,6 +131,7 @@ jobs:
         run: |
           test -f build_winarm/lib/pkgconfig/libass.pc
           test -f build_winarm/lib/libass.a
+          test -f build_winarm/lib/libz.a
           grep -q '^CONFIG_LIBASS=yes' build_winarm/pkg/ffmpeg/ffbuild/config.mak
       - name: Compile
         run: nimble makewinarm && mv auto-editor.exe auto-editor-tiktok-windows-aarch64.exe
