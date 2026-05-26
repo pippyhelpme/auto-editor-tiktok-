@@ -18,19 +18,21 @@ A **fork of [auto-editor](https://github.com/WyattBlue/auto-editor)** (Nim CLI) 
 - Vertical **1080×1920** defaults, snappier margin, H.264 encode, `{stem}_tiktok.mp4` output
 - **Hook window** — first 3s kept uncut (`--set-action nil,0,3sec`)
 - **Caption-safe zone** — content top-aligned in upper 75% of frame
-- **Burn-in captions** — FFmpeg `subtitles` filter via libass (static release builds, all platforms)
+- **Burn-in captions** — FFmpeg `subtitles` filter via libass (Linux/macOS static release builds; Windows deferred)
 
-Release binaries are built by GitHub Actions (`release-build` workflow). Attach to [Releases](https://github.com/pippyhelpme/auto-editor-tiktok-/releases). Windows cross-builds bundle libass for burn-in (same stack as Linux/macOS); verified in CI via `smoke` / `release-build` jobs.
+Release binaries are built by GitHub Actions (`release-build` workflow). Attach to [Releases](https://github.com/pippyhelpme/auto-editor-tiktok-/releases). **Linux and macOS** static builds include libass burn-in. Windows release binaries omit burn-in until a later release (deferred — see plan below).
 
 **Creator onboarding:** [docs/creator-quickstart.md](docs/creator-quickstart.md) — install, workflows, modifiers, troubleshooting.
 
 ## Current plan (2026-05-26)
 
-**North star:** Platform parity — Windows release binaries support **burn-in captions** (libass), matching Linux/macOS.
+**North star (now):** **Linux-first** — you dogfood on Linux; prove `--profile tiktok` workflows before investing in cross-platform release engineering.
 
-**Phase 1 — v0.3 (platform parity, in progress):** Bundle zlib → freetype → fribidi → harfbuzz → libass in Windows cross-compile builds (`gccWin`, `llvmWin` in `ae.nimble`). Link the libass stack in `config.nims` for `defined(windows)` static builds. Verification is **CI-only** — `smoke` on PRs and `release-build` on tags; no local `nimble makeffwin` runs during development.
+**Phase 1 — dogfood on Linux (now):** Use the [Linux release binary](https://github.com/pippyhelpme/auto-editor-tiktok-/releases) or `nimble make` locally. Run the five workflows in [creator-validation.md](docs/creator-validation.md). File issues for anything broken. No Windows cross-build or multi-hour CI release runs until this passes.
 
-**Phase 2 — creator validation (next):** Dogfood five workflows yourself ([creator-validation.md](docs/creator-validation.md)), triage issues, then recruit 2–3 creators with the feedback template in that doc. Feedback drives v0.4+ (smarter clip ranking, distribution, etc.).
+**Phase 2 — creator validation:** Triage Phase 1 issues, then recruit 2–3 creators (same doc). Feedback drives v0.4+ features.
+
+**Deferred — Windows burn-in parity:** Bundle libass in Windows cross-builds (`gccWin` / `llvmWin`). Revisit only after Linux dogfood is green; automate via CI then, not before.
 
 ## Glossary — inherited from auto-editor
 
@@ -66,6 +68,7 @@ Use these terms for TikTok-facing work. Do **not** invent synonyms once defined 
 | **Batch folder export** | Process every video in a folder with the same CLI options via `--input-dir DIR`. Optional `--output-dir DIR` collects outputs in one place. Implemented in `src/tiktok/batch.nim`. |
 | **Creator quickstart** | Onboarding doc for TikTok creators: first export, workflows, profile modifiers, troubleshooting. See `docs/creator-quickstart.md`. |
 | **Creator validation** | Dogfood checklist + recruited-creator feedback template before v0.4 feature work. See `docs/creator-validation.md`. |
+| **Deferred platform work** | Windows libass in cross-build release binaries. Not blocking Linux dogfood. |
 
 ## Code layout
 

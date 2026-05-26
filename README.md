@@ -74,7 +74,7 @@ chmod +x auto-editor-tiktok-linux-x86_64
 ./auto-editor-tiktok-linux-x86_64 example.mp4 --profile tiktok
 ```
 
-Burn-in captions (`--burn-captions`) are bundled in static release builds for Linux, macOS, and Windows (libass cross-compiled in CI).
+Burn-in captions (`--burn-captions`) require the Linux/macOS static builds (libass bundled). Windows pre-built binaries do not include burn-in yet.
 
 ### Build from source
 

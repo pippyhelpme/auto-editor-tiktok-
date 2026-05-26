@@ -1,8 +1,8 @@
 # Creator validation — dogfood then recruit
 
-Use this after **v0.3.0-tiktok** is tagged (Windows burn-in parity). Goal: find real friction before investing in smarter clip ranking or distribution.
+Use this on **Linux first** (your platform). Goal: prove `--profile tiktok` workflows before any Windows release-engineering or multi-hour CI builds.
 
-**Onboarding for commands:** [creator-quickstart.md](creator-quickstart.md)
+**Install:** [README — Linux release binary](../README.md#installing-this-fork) or build locally on Fedora (`nimble make` after `nimble makeff`).
 
 ---
 

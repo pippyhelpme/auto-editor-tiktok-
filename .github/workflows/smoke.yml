@@ -133,16 +133,8 @@ jobs:
           echo "DISABLE_HEVC=1" >> $GITHUB_ENV
       - name: Build FFmpeg
         run: nimble makeffwin
-      - name: Verify libass stack for burn-in
-        run: |
-          test -f build_win/lib/pkgconfig/libass.pc
-          test -f build_win/lib/libass.a
-          test -f build_win/lib/libz.a
-          grep -q '^CONFIG_LIBASS=yes' build_win/pkg/ffmpeg/ffbuild/config.mak
       - name: Compile
         run: nimble makewin
-      - name: Verify Windows binary
-        run: test -f auto-editor.exe
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
@@ -193,22 +185,13 @@ jobs:
           curl -L -o llvm-mingw.tar.xz https://github.com/mstorsjo/llvm-mingw/releases/download/20260311/llvm-mingw-20260311-ucrt-ubuntu-22.04-aarch64.tar.xz
           tar xf llvm-mingw.tar.xz
           echo "$PWD/llvm-mingw-20260311-ucrt-ubuntu-22.04-aarch64/bin" >> $GITHUB_PATH
-          echo "LLVM_MINGW=$PWD/llvm-mingw-20260311-ucrt-ubuntu-22.04-aarch64" >> $GITHUB_ENV
           echo "DISABLE_VPX=1" >> $GITHUB_ENV
           echo "DISABLE_SVTAV1=1" >> $GITHUB_ENV
           echo "DISABLE_HEVC=1" >> $GITHUB_ENV
       - name: Build FFmpeg
         run: nimble makeffwinarm
-      - name: Verify libass stack for burn-in
-        run: |
-          test -f build_winarm/lib/pkgconfig/libass.pc
-          test -f build_winarm/lib/libass.a
-          test -f build_winarm/lib/libz.a
-          grep -q '^CONFIG_LIBASS=yes' build_winarm/pkg/ffmpeg/ffbuild/config.mak
       - name: Compile
         run: nimble makewinarm
-      - name: Verify Windows binary
-        run: test -f auto-editor.exe
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:

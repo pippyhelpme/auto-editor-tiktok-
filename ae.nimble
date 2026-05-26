@@ -221,11 +221,6 @@ let freetype = Package(
   sourceUrl: "https://download.savannah.gnu.org/releases/freetype/freetype-2.13.3.tar.xz",
   sha256: "0550350666d427c74daeb85d5ac7bb353acba5f76956395995311a9c6f063289",
 )
-let zlibPkg = Package(
-  name: "zlib",
-  sourceUrl: "https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz",
-  sha256: "9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b72df23",
-)
 let fribidi = Package(
   name: "fribidi",
   sourceUrl: "https://github.com/fribidi/fribidi/releases/download/v1.0.14/fribidi-1.0.14.tar.xz",
@@ -279,9 +274,7 @@ proc selectPackages(kind: CrossKind = native): seq[Package] =
   if enableWhisper:
     result.add whisper
   result &= [lame, opus, dav1d, x264]
-  if kind == native or kind == gccWin or kind == llvmWin:
-    if kind == gccWin or kind == llvmWin:
-      result.add zlibPkg
+  if kind == native:
     result.add freetype
     result.add fribidi
     result.add harfbuzz
@@ -725,7 +718,7 @@ proc ffmpegSetup(buildPath: string): seq[Package] =
                 if kind == llvmWin:
                   if package.name == "libvpx":
                     args.add("--target=arm64-win64-gcc")
-                  elif package.name != "zlib":
+                  else:
                     args.add("--host=aarch64-w64-mingw32")
                   if package.name == "opus":
                     args.add("--disable-rtcd")
@@ -745,17 +738,12 @@ proc ffmpegSetup(buildPath: string): seq[Package] =
                 elif kind == gccWin:
                   if package.name == "libvpx":
                     args.add("--target=x86_64-win64-gcc")
-                  elif package.name != "zlib":
+                  else:
                     args.add("--host=x86_64-w64-mingw32")
                   envPrefix = "CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ AR=x86_64-w64-mingw32-ar STRIP=x86_64-w64-mingw32-strip RANLIB=x86_64-w64-mingw32-ranlib "
-                if package.name == "zlib":
-                  args.add "--static"
-                elif package.name != "x264":
+                if package.name != "x264":
                   args.add "--disable-shared"
-                let staticFlag =
-                  if package.name == "zlib": ""
-                  else: "--enable-static "
-                let cmd = &"{envPrefix}{sourceDir}/configure --prefix=\"{buildPath}\" {staticFlag}" & args.join(" ")
+                let cmd = &"{envPrefix}{sourceDir}/configure --prefix=\"{buildPath}\" --enable-static " & args.join(" ")
                 echo "RUN: ", cmd
                 exec cmd
               makeInstall()
@@ -860,7 +848,7 @@ proc setupDeps =
     exec "pip install " & toInstall.join(" ")
 
 task downloaddeps, "Download and Extract Cxx Dependencies":
-  let allPackages = @[ffmpeg, nvheaders, libvpl, whisper, lame, opus, dav1d, x264, zlibPkg, freetype, fribidi, harfbuzz, libassPkg, vpx, svtav1, x265]
+  let allPackages = @[ffmpeg, nvheaders, libvpl, whisper, lame, opus, dav1d, x264, freetype, fribidi, harfbuzz, libassPkg, vpx, svtav1, x265]
   mkDir "ffmpeg_sources"
   withDir "ffmpeg_sources":
     for package in allPackages:
@@ -903,15 +891,13 @@ task makeff, "Build FFmpeg from source":
 
 task makeffwin, "Build FFmpeg for Windows cross-compilation":
   setupDeps()
-  let pkgConfigPath = winBuildPath / "lib/pkgconfig"
-  putEnv("PKG_CONFIG_PATH", pkgConfigPath)
-  putEnv("PKG_CONFIG_LIBDIR", pkgConfigPath)
+  putEnv("PKG_CONFIG_PATH", winBuildPath / "lib/pkgconfig")
   let packages = ffmpegSetup(winBuildPath)
 
   let ffmpegBuildDirWin = winBuildPath / "pkg" / "ffmpeg"
   mkDir(ffmpegBuildDirWin)
   withDir ffmpegBuildDirWin:
-    exec (&"""CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ AR=x86_64-w64-mingw32-ar STRIP=x86_64-w64-mingw32-strip RANLIB=x86_64-w64-mingw32-ranlib PKG_CONFIG_PATH="{pkgConfigPath}" PKG_CONFIG_LIBDIR="{pkgConfigPath}" {ffmpegSrcDir}/configure --prefix="{winBuildPath}" \
+    exec (&"""CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ AR=x86_64-w64-mingw32-ar STRIP=x86_64-w64-mingw32-strip RANLIB=x86_64-w64-mingw32-ranlib PKG_CONFIG_PATH="{winBuildPath}/lib/pkgconfig" {ffmpegSrcDir}/configure --prefix="{winBuildPath}" \
       --pkg-config-flags="--static" \
       --extra-cflags="-I{winBuildPath}/include" \
       --extra-ldflags="-L{winBuildPath}/lib" \
