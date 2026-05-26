@@ -918,6 +918,7 @@ task makewin, "Cross-compile to Windows (requires mingw-w64)":
     exec "nim c -d:danger --panics:on --os:windows --cpu:amd64 --cc:gcc " &
          "--gcc.exe:x86_64-w64-mingw32-gcc " &
          "--gcc.linkerexe:x86_64-w64-mingw32-gcc " &
+         "--passL:-L/usr/x86_64-w64-mingw32/lib --passL:-lz " &
          "--passL:-static " &
          "--out:auto-editor.exe src/main.nim"
     stripProgram(gccWin)
@@ -951,10 +952,14 @@ task makewinarm, "Cross-compile to Windows ARM64 (requires llvm-mingw)":
   if not dirExists(winArmBuildPath):
     echo "FFmpeg for Windows ARM64 not found. Run 'nimble makeffwinarm' first."
   else:
+    var linkFlags = "--passL:-static "
+    let llvmMingw = getEnv("LLVM_MINGW")
+    if llvmMingw != "":
+      linkFlags &= &"--passL:-L{llvmMingw}/aarch64-w64-mingw32/lib --passL:-lz "
     exec "nim c -d:danger --panics:on --os:windows --cpu:arm64 --cc:clang " &
          "--clang.exe:aarch64-w64-mingw32-clang " &
          "--clang.linkerexe:aarch64-w64-mingw32-clang " &
-         "--passL:-static " &
+         linkFlags &
          "--out:auto-editor.exe src/main.nim"
     stripProgram(llvmWin)
 
