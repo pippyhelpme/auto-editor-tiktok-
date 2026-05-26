@@ -748,9 +748,14 @@ proc ffmpegSetup(buildPath: string): seq[Package] =
                   else:
                     args.add("--host=x86_64-w64-mingw32")
                   envPrefix = "CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ AR=x86_64-w64-mingw32-ar STRIP=x86_64-w64-mingw32-strip RANLIB=x86_64-w64-mingw32-ranlib "
-                if package.name != "x264":
+                if package.name == "zlib":
+                  args.add "--static"
+                elif package.name != "x264":
                   args.add "--disable-shared"
-                let cmd = &"{envPrefix}{sourceDir}/configure --prefix=\"{buildPath}\" --enable-static " & args.join(" ")
+                let staticFlag =
+                  if package.name == "zlib": ""
+                  else: "--enable-static "
+                let cmd = &"{envPrefix}{sourceDir}/configure --prefix=\"{buildPath}\" {staticFlag}" & args.join(" ")
                 echo "RUN: ", cmd
                 exec cmd
               makeInstall()
