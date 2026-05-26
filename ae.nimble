@@ -725,7 +725,7 @@ proc ffmpegSetup(buildPath: string): seq[Package] =
                 if kind == llvmWin:
                   if package.name == "libvpx":
                     args.add("--target=arm64-win64-gcc")
-                  else:
+                  elif package.name != "zlib":
                     args.add("--host=aarch64-w64-mingw32")
                   if package.name == "opus":
                     args.add("--disable-rtcd")
@@ -745,7 +745,7 @@ proc ffmpegSetup(buildPath: string): seq[Package] =
                 elif kind == gccWin:
                   if package.name == "libvpx":
                     args.add("--target=x86_64-win64-gcc")
-                  else:
+                  elif package.name != "zlib":
                     args.add("--host=x86_64-w64-mingw32")
                   envPrefix = "CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ AR=x86_64-w64-mingw32-ar STRIP=x86_64-w64-mingw32-strip RANLIB=x86_64-w64-mingw32-ranlib "
                 if package.name == "zlib":
