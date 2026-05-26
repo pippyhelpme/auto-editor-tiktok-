@@ -221,6 +221,11 @@ let freetype = Package(
   sourceUrl: "https://download.savannah.gnu.org/releases/freetype/freetype-2.13.3.tar.xz",
   sha256: "0550350666d427c74daeb85d5ac7bb353acba5f76956395995311a9c6f063289",
 )
+let zlibPkg = Package(
+  name: "zlib",
+  sourceUrl: "https://zlib.net/zlib-1.3.1.tar.gz",
+  sha256: "9a93b2b7df976f6c0d06665382ab0ff5519aa1fd645017783980ad2a286705c",
+)
 let fribidi = Package(
   name: "fribidi",
   sourceUrl: "https://github.com/fribidi/fribidi/releases/download/v1.0.14/fribidi-1.0.14.tar.xz",
@@ -275,6 +280,8 @@ proc selectPackages(kind: CrossKind = native): seq[Package] =
     result.add whisper
   result &= [lame, opus, dav1d, x264]
   if kind == native or kind == gccWin or kind == llvmWin:
+    if kind == gccWin or kind == llvmWin:
+      result.add zlibPkg
     result.add freetype
     result.add fribidi
     result.add harfbuzz
@@ -846,7 +853,7 @@ proc setupDeps =
     exec "pip install " & toInstall.join(" ")
 
 task downloaddeps, "Download and Extract Cxx Dependencies":
-  let allPackages = @[ffmpeg, nvheaders, libvpl, whisper, lame, opus, dav1d, x264, freetype, fribidi, harfbuzz, libassPkg, vpx, svtav1, x265]
+  let allPackages = @[ffmpeg, nvheaders, libvpl, whisper, lame, opus, dav1d, x264, zlibPkg, freetype, fribidi, harfbuzz, libassPkg, vpx, svtav1, x265]
   mkDir "ffmpeg_sources"
   withDir "ffmpeg_sources":
     for package in allPackages:
@@ -918,7 +925,6 @@ task makewin, "Cross-compile to Windows (requires mingw-w64)":
     exec "nim c -d:danger --panics:on --os:windows --cpu:amd64 --cc:gcc " &
          "--gcc.exe:x86_64-w64-mingw32-gcc " &
          "--gcc.linkerexe:x86_64-w64-mingw32-gcc " &
-         "--passL:-L/usr/x86_64-w64-mingw32/lib --passL:-lz " &
          "--passL:-static " &
          "--out:auto-editor.exe src/main.nim"
     stripProgram(gccWin)
@@ -952,14 +958,10 @@ task makewinarm, "Cross-compile to Windows ARM64 (requires llvm-mingw)":
   if not dirExists(winArmBuildPath):
     echo "FFmpeg for Windows ARM64 not found. Run 'nimble makeffwinarm' first."
   else:
-    var linkFlags = "--passL:-static "
-    let llvmMingw = getEnv("LLVM_MINGW")
-    if llvmMingw != "":
-      linkFlags &= &"--passL:-L{llvmMingw}/aarch64-w64-mingw32/lib --passL:-lz "
     exec "nim c -d:danger --panics:on --os:windows --cpu:arm64 --cc:clang " &
          "--clang.exe:aarch64-w64-mingw32-clang " &
          "--clang.linkerexe:aarch64-w64-mingw32-clang " &
-         linkFlags &
+         "--passL:-static " &
          "--out:auto-editor.exe src/main.nim"
     stripProgram(llvmWin)
 

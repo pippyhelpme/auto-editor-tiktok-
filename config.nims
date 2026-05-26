@@ -64,9 +64,7 @@ if not defined(dynamic):
   switch("passL", "-lavfilter -lavformat -lavcodec -lswresample -lswscale -lavutil")
   when not defined(emscripten) and (hostOS == "linux" or hostOS == "macosx" or defined(windows)):
     # subtitles filter → libass (bundled in static builds, including Windows cross-compile)
-    switch("passL", "-lass -lharfbuzz -lfribidi -lfreetype")
-    when hostOS == "linux" or hostOS == "macosx":
-      switch("passL", "-lz")
+    switch("passL", "-lass -lharfbuzz -lfribidi -lfreetype -lz")
     when hostOS == "macosx":
       switch("passL", "-lbz2 -liconv -framework CoreText")
   # Codec libraries

@@ -137,6 +137,7 @@ jobs:
         run: |
           test -f build_win/lib/pkgconfig/libass.pc
           test -f build_win/lib/libass.a
+          test -f build_win/lib/libz.a
           grep -q '^CONFIG_LIBASS=yes' build_win/pkg/ffmpeg/ffbuild/config.mak
       - name: Compile
         run: nimble makewin
@@ -202,6 +203,7 @@ jobs:
         run: |
           test -f build_winarm/lib/pkgconfig/libass.pc
           test -f build_winarm/lib/libass.a
+          test -f build_winarm/lib/libz.a
           grep -q '^CONFIG_LIBASS=yes' build_winarm/pkg/ffmpeg/ffbuild/config.mak
       - name: Compile
         run: nimble makewinarm
