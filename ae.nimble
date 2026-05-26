@@ -224,7 +224,7 @@ let freetype = Package(
 let zlibPkg = Package(
   name: "zlib",
   sourceUrl: "https://zlib.net/zlib-1.3.1.tar.gz",
-  sha256: "9a93b2b7df976f6c0d06665382ab0ff5519aa1fd645017783980ad2a286705c",
+  sha256: "cc0b4e42510d49c6decd464123ecf3b14ae9b4ed2ee64893e2d6520a264",
 )
 let fribidi = Package(
   name: "fribidi",
