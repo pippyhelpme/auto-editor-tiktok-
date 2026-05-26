@@ -23,7 +23,7 @@ That one command:
 - Exports **1080×1920** vertical H.264
 - Keeps the first **3 seconds** uncut (hook window)
 - Frames faces/content in the **upper 75%** (caption-safe zone)
-- Burns in captions when the file has embedded subs (Linux/macOS builds)
+- Burns in captions when the file has embedded subs or you pass `--captions FILE` (Linux/macOS static release builds)
 
 Preview cuts without rendering:
 
@@ -79,7 +79,7 @@ Supported formats in the folder: `.mp4`, `.mkv`, `.mov`, `.avi`, `.webm`, `.m4v`
 auto-editor interview.mp4 --profile tiktok --captions interview.srt
 ```
 
-Use `--burn-captions` explicitly if you are not using the TikTok profile. Burn-in requires a **Linux or macOS** build (libass bundled in static releases).
+Use `--burn-captions` explicitly if you are not using the TikTok profile. Burn-in requires a **Linux or macOS** static release build (libass bundled).
 
 ### Snappier or slower pacing
 
@@ -152,7 +152,7 @@ auto-editor clip.mp4 --profile tiktok --no-caption-safe-zone
 ### Captions did not burn in
 
 - Confirm subs exist: `auto-editor info yourfile.mp4`
-- On Windows pre-built binaries, burn-in is **not** available yet — use Linux/macOS release binary or build from source with libass
+- On Linux/macOS, use a static release binary with libass. Windows pre-built binaries do not include burn-in yet.
 - Force a caption file: `--captions subs.srt`
 
 ### Hook feels too long or too short
@@ -177,6 +177,7 @@ Add captions, hashtags, and sound in TikTok after upload unless you burned them 
 
 ## Next steps
 
+- **Validate before v0.4:** [Creator validation checklist](creator-validation.md) — dogfood five workflows, then recruit 2–3 creators
 - Full CLI reference: `auto-editor --help`
 - Upstream options and edit syntax: [auto-editor.com/docs](https://auto-editor.com/docs)
 - Fork domain terms: [CONTEXT.md](../CONTEXT.md)

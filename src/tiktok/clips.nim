@@ -93,10 +93,12 @@ proc clipIndexLabel*(index, total: int): string =
   return $num
 
 proc clipOutputPath*(inputPath, userOutput: string, index, total: int): string =
-  let (dir, name, _) =
+  let (_, inName, _) = agSplitFile(inputPath)
+  let outDir =
     if userOutput != "":
-      agSplitFile(userOutput)
+      agSplitFile(userOutput)[0]
     else:
-      agSplitFile(inputPath)
+      agSplitFile(inputPath)[0]
+  let dir = if outDir.len > 0: outDir else: "."
   let label = clipIndexLabel(index, total)
-  joinPath(dir, name & "_clip" & label & "_tiktok.mp4")
+  joinPath(dir, inName & "_clip" & label & "_tiktok.mp4")

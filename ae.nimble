@@ -321,14 +321,16 @@ proc getFileHash(filename: string): string =
   return output.split()[0]
 
 proc download(package: Package) =
-  if not fileExists(package.location):
-    exec &"curl -O -L {package.sourceUrl}"
-    let filename = "ffmpeg_sources" / package.location
-    let hash = getFileHash(filename)
-    if package.sha256 != hash:
-      echo &"{filename}\nsha256 hash of {package.name} tarball do not match!"
-      echo &"Expected: {package.sha256}\nGot: {hash}"
-      quit(1)
+  let tarball = absolutePath(package.location)
+  if not fileExists(tarball):
+    exec &"curl -o {package.location} -L {package.sourceUrl}"
+  if not fileExists(tarball):
+    raise newException(IOError, "Download failed: " & tarball)
+  let hash = getFileHash(tarball)
+  if package.sha256 != hash:
+    echo &"{tarball}\nsha256 hash of {package.name} tarball do not match!"
+    echo &"Expected: {package.sha256}\nGot: {hash}"
+    quit(1)
 
 proc extract(package: Package) =
   if not dirExists(package.name):
